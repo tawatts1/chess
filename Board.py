@@ -13,17 +13,8 @@ from tkinter import ttk
 from time import sleep
 import numpy as np
 
-def piece_to_fname(piece):
-    if len(piece) == 2:
-        if piece[0] in 'bw':
-            if piece[1] in 'kqbnrp':
-                return 'images/' + piece + '.png'
-    return None
 
-
-
-
-def index_to_piece(index, piece_f = piece_to_fname):
+def index_to_piece(index):
     if index[0] is 1:
         out = 'bp'
     elif index[0] is 6:
@@ -36,8 +27,18 @@ def index_to_piece(index, piece_f = piece_to_fname):
         out = 'w' + out0[index[1]]
     else:
         return None
-    
-    return piece_f(out)
+    return out
+def piece_to_fname(piece):
+    if piece is None:
+        return None
+    elif len(piece) == 2:
+        if piece[0] in 'bw':
+            if piece[1] in 'kqbnrp':
+                return 'images/' + piece + '.png'
+    return None
+def index_to_fname(index, piece_f = piece_to_fname):    
+    return piece_f(  index_to_piece(index)  )
+
 
 def f1():
     print(100)
@@ -61,7 +62,7 @@ class Board(ttk.Frame):
                     bg_color = 'grey'
                 else:
                     bg_color = 'brown'
-                fname = index_to_piece([i,j])
+                fname = index_to_fname([i,j])
                 sq = Square(self, 
                             img = fname,#piece_to_fname('bk'),#
                             color = bg_color,
