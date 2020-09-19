@@ -24,12 +24,20 @@ class Piece():
         out = []
         if self.coords is None:
             return None
-        elif True:#self.name is 'r':
+        elif self.name is 'n':
             for x,y in [(2,1),(2,-1), (1,2),(1,-2), (-1,2),(-1,-2), (-2,1), (-2,-1)]:
                 out0 = np.array([x,y]) + self.coords
                 if in_board_space(out0):
                     out.append(out0)
-            return out
+        elif self.name is 'p':
+            sign = {'b':1,'w':-1}[self.color]
+            for xy in [(sign,0), (sign,1),(sign,-1)]:
+                out0 = np.array(xy) + self.coords
+                if in_board_space(out0):
+                    out.append(out0)
+        else:
+            out = [self.coords]
+        return out
                     
          
             
