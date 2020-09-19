@@ -50,7 +50,13 @@ class Piece():
                     out0 = self.coords + multiplier*xy
                     if in_board_space(out0) and not (out0 == self.coords).all():
                         out.append(out0)
-                        
+        elif self.name is 'k':
+            for x in range(-1,2):
+                for y in range(-1,2):
+                    out0 = self.coords + np.array([x,y])
+                    if in_board_space(out0) and not (out0 == self.coords).all():
+                        out.append(out0)
+            
         elif self.name is 'p': # Pawn
             sign = {'b':1,'w':-1}[self.color]
             for xy in [(sign,0), (sign,1),(sign,-1)]:
