@@ -15,14 +15,14 @@ import numpy as np
 
 
 def index_to_piece(index):
-    if index[0] is 1:
+    if index[0] == 1:
         out = 'bp'
-    elif index[0] is 6:
+    elif index[0] == 6:
         out = 'wp'
-    elif index[0] is 0:
+    elif index[0] == 0:
         out0 = {0:'r', 1:'n', 2:'b', 3:'q', 4:'k', 5:'b', 6:'n', 7:'r'}
         out = 'b' + out0[index[1]]
-    elif index[0] is 7:
+    elif index[0] == 7:
         out0 = {0:'r', 1:'n', 2:'b', 3:'q', 4:'k', 5:'b', 6:'n', 7:'r'}
         out = 'w' + out0[index[1]]
     else:
@@ -41,7 +41,7 @@ def index_to_fname(index, piece_f = piece_to_fname):
 
 
 def f1():
-    print(100)
+    print('Default callback from board')
 
 class Board(ttk.Frame):
     def __init__(self, parent, piece_func = piece_to_fname):
@@ -62,12 +62,18 @@ class Board(ttk.Frame):
                     bg_color = 'grey'
                 else:
                     bg_color = 'brown'
-                fname = index_to_fname([i,j])
+                full_name = index_to_piece([i,j])
+                fname = piece_to_fname(full_name)
+                coords0 = np.array([i,j])
+                if isinstance(full_name, str):
+                    occupant0 = Piece(full_name, coords0)
+                else: 
+                    occupant0 = None
                 sq = Square(self, 
                             img = fname,#piece_to_fname('bk'),#
                             color = bg_color,
-                            index = np.array([i,j]), 
-                            callback = f1)
+                            index = coords0, 
+                            occupant = occupant0)
                 self.squares.append(sq)
                 sq.grid(row=i, column=j)
                 row.append(sq)
