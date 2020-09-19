@@ -44,12 +44,13 @@ def f1():
     print('Default callback from board')
 
 class Board(ttk.Frame):
-    def __init__(self, parent, piece_func = piece_to_fname):
+    def __init__(self, parent, piece_func = piece_to_fname, 
+                 board_color = {0:'grey',1:'brown'}):
         super().__init__(parent)
         
         self.parent = parent
         self.squares = []
-        
+        self.board_color = board_color
         self.board = self.setup_new_game()
         self.grid(row=0, column=0)
         
@@ -59,10 +60,6 @@ class Board(ttk.Frame):
         for i in range(8):
             row = []
             for j in range(8):
-                if (i%2+j%2)%2==0:
-                    bg_color = 'grey'
-                else:
-                    bg_color = 'brown'
                 full_name = index_to_piece([i,j])
                 fname = piece_to_fname(full_name)
                 coords0 = np.array([i,j])
@@ -72,7 +69,6 @@ class Board(ttk.Frame):
                     occupant0 = None
                 sq = Square(self, 
                             img = fname,
-                            color = bg_color,
                             index = coords0, 
                             occupant = occupant0)
                 #sq.config(command = sq.get_moves)
@@ -83,15 +79,22 @@ class Board(ttk.Frame):
             board0.append(row)
         for square in self.squares:
             square.config(command = partial(self.highlight_squares, square.get_moves(self.sq_dict)))
+        self.paint_checkerboard()
         return board0
     def highlight_squares(self, indeces):
+        self.paint_checkerboard()
         if indeces is not None:
             for index in indeces:
                 sq = self.sq_dict[tuple(index)]
                 sq.config(bg = 'red')
         else:
-            print('todo: handle none square')
-
+            pass
+   
+    def paint_checkerboard(self):
+        for i in range(8):
+            for j in range(8):
+                bg_color = self.board_color[(i%2+j%2)%2]
+                self.sq_dict[(i,j)].config(bg = bg_color)
 
 if __name__ == '__main__':
    
