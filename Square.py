@@ -10,7 +10,7 @@ from tkinter import ttk
 def none_callback():
     print('None callback')
 
-class Square(ttk.Frame):
+class Square(tk.Button):
     def __init__(self, parent, img = None, color = 'grey', 
                  index = None, occupant = None):
         super().__init__(parent)
@@ -25,15 +25,13 @@ class Square(ttk.Frame):
             photo = tk.PhotoImage(file = img)
         
         if occupant == None:
-            self.button = tk.Button(self, image = photo, bg = color, 
+            self.config(image = photo, bg = color, 
                                 height = 60, width = 60, command = none_callback)
         else:
-            self.button = tk.Button(self, image = photo, bg = color, 
+            self.config(image = photo, bg = color, 
                                 height = 60, width = 60, command = self.get_moves)
-        
-        self.button.grid(row=0, column=0)
-        self.button.image = photo
-        #self.config(bg = 'yellow')
+            
+        self.image = photo
         self.grid(row=0,column=0)
     def get_moves(self):
         if self.occupant is not None:
