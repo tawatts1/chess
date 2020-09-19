@@ -26,18 +26,19 @@ class Square(tk.Button):
         
         if occupant == None:
             self.config(image = photo, bg = color, 
-                                height = 60, width = 60, command = none_callback)
+                                height = 60, width = 60)#, command = none_callback)
         else:
             self.config(image = photo, bg = color, 
-                                height = 60, width = 60, command = self.get_moves)
+                                height = 60, width = 60)#, command = self.get_moves)
             
         self.image = photo
         self.grid(row=0,column=0)
-    def get_moves(self):
+    def get_moves(self, sq_dict):
         if self.occupant is not None:
+            #print(sq_dict)
             return self.occupant.moves()
         else:
-            print("None case is not handled 001")
+            return None
     
 if __name__ == '__main__':
     

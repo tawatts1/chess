@@ -12,7 +12,7 @@ from tkinter import ttk
 #import tkMessageBox
 from time import sleep
 import numpy as np
-
+from functools import partial 
 
 def index_to_piece(index):
     if index[0] == 1:
@@ -55,6 +55,7 @@ class Board(ttk.Frame):
         
     def setup_new_game(self):
         board0 = []
+        self.sq_dict = {}
         for i in range(8):
             row = []
             for j in range(8):
@@ -70,16 +71,26 @@ class Board(ttk.Frame):
                 else: 
                     occupant0 = None
                 sq = Square(self, 
-                            img = fname,#piece_to_fname('bk'),#
+                            img = fname,
                             color = bg_color,
                             index = coords0, 
                             occupant = occupant0)
+                #sq.config(command = sq.get_moves)
+                self.sq_dict[tuple(coords0)] = sq
                 self.squares.append(sq)
                 sq.grid(row=i, column=j)
                 row.append(sq)
             board0.append(row)
+        for square in self.squares:
+            square.config(command = partial(self.highlight_squares, square.get_moves(self.sq_dict)))
         return board0
-        
+    def highlight_squares(self, indeces):
+        if indeces is not None:
+            for index in indeces:
+                sq = self.sq_dict[tuple(index)]
+                sq.config(bg = 'red')
+        else:
+            print('todo: handle none square')
 
 
 if __name__ == '__main__':
