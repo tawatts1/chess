@@ -53,6 +53,7 @@ class Board(ttk.Frame):
         self.board_color = board_color
         self.board = self.setup_new_game()
         self.grid(row=0, column=0)
+        self.old_commands = {}
         
     def setup_new_game(self):
         board0 = []
@@ -82,7 +83,9 @@ class Board(ttk.Frame):
                 row.append(sq)
             board0.append(row)
         for square in self.squares:
-            square.config(command = partial(self.highlight_squares, self.moves(tuple(square.index))))
+            cmd0 = partial(self.highlight_squares, square.index, self.moves(tuple(square.index)))
+            square.config(command = cmd0)
+            square.set_command(cmd0)
         self.paint_checkerboard()
         return board0
     def moves(self, coords):#, friendlies, enemies):
@@ -136,15 +139,55 @@ class Board(ttk.Frame):
             out = [coords]
         
         return out
-    def highlight_squares(self, indeces):
+    def highlight_squares(self, i0, indeces):
         self.paint_checkerboard()
         if indeces is not None:
             for index in indeces:
                 sq = self.sq_dict[tuple(index)]
                 sq.config(bg = 'yellow')
+            self.enable_move(i0, indeces)
         else:
             pass
-   
+    def enable_move(self, i0, indeces):
+        print(i0, indeces)
+        sq0 = self.sq_dict[tuple(i0)]
+        for i in indeces:
+            sqi = self.sq_dict[tuple(i)]
+            def cmd(sq0, sqi):
+                self.paint_checkerboard()
+                sq0.change_photo(None)
+                fname = piece_to_fname(sq0.occupant.color_name)
+                sqi.change_photo(fname)
+                sqi.change_occupant(sq0.occupant)
+                sq0.change_occupant(None)
+            sqi.config(command = partial(cmd, sq0, sqi))
+        
+        
+        
+        '''
+        sq0 = self.sq_dict[tuple(i0)]
+        for i in indeces:
+            def cmd():
+                print(1000)
+                self.paint_checkerboard()
+                sq0.config(image = tk.PhotoImage())
+                new_photo = tk.PhotoImage(file = piece_to_fname(sq0.occupant.color_name))
+                sqi.config(image = new_photo)
+                sqi.image = new_photo
+                sqi.change_occupant(sq0.occupant)
+                sq0.change_occupant(None)
+            sqi = self.sq_dict[tuple(i)]
+            self.old_commands[tuple(i)] = sqi.command
+            def cmd():
+                sq0.config(image = tk.PhotoImage())
+                sqi.config(image = tk.PhotoImage(file = piece_to_fname(sq0.occupant.color_name)))
+                sqi.change_occupant(sq0.occupant)
+                sq0.change_occupant(None)
+                
+            cmd0 = partial(cmd)
+            sqi.config(command = cmd0)
+            sqi.set_command(cmd0)
+            '''
     def paint_checkerboard(self):
         for i in range(8):
             for j in range(8):

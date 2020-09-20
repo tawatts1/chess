@@ -21,6 +21,9 @@ class Piece():
         self.name = color_name[1]
         self.coords = coords
         self.has_moved = False
+    def record_move(self, new_coords):
+        self.coords = new_coords
+        self.has_moved = True
     
                     
          

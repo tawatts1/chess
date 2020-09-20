@@ -33,12 +33,23 @@ class Square(tk.Button):
             
         self.image = photo
         self.grid(row=0,column=0)
-    def get_moves(self, sq_dict):
-        if self.occupant is not None:
-            #print(sq_dict)
-            return self.occupant.moves()
+        self.command = None
+    
+    def change_occupant(self, new_occupant):
+        if new_occupant is None:
+            self.occupant = None
         else:
-            return None
+            new_occupant.record_move(self.index)
+            self.occupant = new_occupant
+    def change_photo(self, fname):
+        if fname is not None:
+            photo = tk.PhotoImage(file = fname)
+        else:
+            photo = tk.PhotoImage()
+        self.config(image = photo)
+        self.image = photo
+    def set_command(self,cmd):
+        self.command = cmd
     
 if __name__ == '__main__':
     
