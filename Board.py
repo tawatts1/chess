@@ -82,9 +82,60 @@ class Board(ttk.Frame):
                 row.append(sq)
             board0.append(row)
         for square in self.squares:
-            square.config(command = partial(self.highlight_squares, square.get_moves(self.sq_dict)))
+            square.config(command = partial(self.highlight_squares, self.moves(tuple(square.index))))
         self.paint_checkerboard()
         return board0
+    def moves(self, coords):#, friendlies, enemies):
+        sq = self.sq_dict[tuple(coords)]
+        out = []
+        if sq.occupant is None:
+            return None
+        name = sq.occupant.name
+        if coords is None:
+            return None
+        elif name is 'n':# Knight
+            for x,y in [(2,1),(2,-1), (1,2),(1,-2), (-1,2),(-1,-2), (-2,1), (-2,-1)]:
+                out0 = np.array([x,y]) + coords
+                if in_board_space(out0):
+                    out.append(out0)
+                    
+        elif name is 'b': # Bishop
+            for xy in [np.array([-1,1]), np.array([1,1])]:
+                for multiplier in range(-8,9):
+                    out0 = coords + multiplier*xy
+                    if in_board_space(out0) and not (out0 == coords).all():
+                        out.append(out0)
+                        
+        elif name is 'r': # Rook
+            for xy in [np.array([1,0]), np.array([0,1])]:
+                for multiplier in range(-8,9):
+                    out0 = coords + multiplier*xy
+                    if in_board_space(out0) and not (out0 == coords).all():
+                        out.append(out0)
+        elif name is 'q': # Queen
+            for xy in [np.array([1,0]), np.array([0,1]), 
+                       np.array([-1,1]), np.array([1,1])]:
+                for multiplier in range(-8,9):
+                    out0 = coords + multiplier*xy
+                    if in_board_space(out0) and not (out0 == coords).all():
+                        out.append(out0)
+        elif name is 'k':
+            for x in range(-1,2):
+                for y in range(-1,2):
+                    out0 = coords + np.array([x,y])
+                    if in_board_space(out0) and not (out0 == coords).all():
+                        out.append(out0)
+            
+        elif name is 'p': # Pawn
+            sign = {'b':1,'w':-1}[sq.occupant.color]
+            for xy in [(sign,0), (sign,1),(sign,-1)]:
+                out0 = np.array(xy) + coords
+                if in_board_space(out0):
+                    out.append(out0)
+        else:
+            out = [coords]
+        
+        return out
     def highlight_squares(self, indeces):
         self.paint_checkerboard()
         if indeces is not None:
