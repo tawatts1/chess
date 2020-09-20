@@ -57,6 +57,8 @@ class Board(ttk.Frame):
     def setup_new_game(self):
         board0 = []
         self.sq_dict = {}
+        self.blist = []
+        self.wlist = []
         for i in range(8):
             row = []
             for j in range(8):
@@ -65,6 +67,8 @@ class Board(ttk.Frame):
                 coords0 = np.array([i,j])
                 if isinstance(full_name, str):
                     occupant0 = Piece(full_name, coords0)
+                    # add to white or black list:
+                    {'b':self.blist, 'w':self.wlist}[full_name[0]].append(coords0)
                 else: 
                     occupant0 = None
                 sq = Square(self, 
@@ -86,7 +90,7 @@ class Board(ttk.Frame):
         if indeces is not None:
             for index in indeces:
                 sq = self.sq_dict[tuple(index)]
-                sq.config(bg = 'red')
+                sq.config(bg = 'yellow')
         else:
             pass
    

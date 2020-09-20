@@ -20,6 +20,7 @@ class Piece():
         self.color = color_name[0]
         self.name = color_name[1]
         self.coords = coords
+        self.has_moved = False
     def moves(self):#, friendlies, enemies):
         out = []
         if self.coords is None:
