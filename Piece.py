@@ -4,6 +4,7 @@
 Created on Sun Sep 13 20:57:06 2020
 
 @author: ted
+TODO: remove
 """
 import numpy as np
 
