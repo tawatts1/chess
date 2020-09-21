@@ -84,10 +84,47 @@ class Board(ttk.Frame):
             board0.append(row)
         for square in self.squares:
             cmd0 = partial(self.highlight_squares, square.index, self.moves(tuple(square.index)))
-            square.config(command = cmd0)
+            #square.config(command = cmd0)
             square.set_command(cmd0)
         self.paint_checkerboard()
         return board0
+    
+    def highlight_squares(self, i0, indeces):
+        self.paint_checkerboard()
+        if indeces is not None:
+            for index in indeces:
+                sq = self.sq_dict[tuple(index)]
+                sq.config(bg = 'yellow')
+            self.enable_move(i0, indeces)
+        else:
+            pass
+    def enable_move(self, i0, indeces):
+        #print(i0, indeces)
+        sq0 = self.sq_dict[tuple(i0)]
+        for i in indeces:
+            sqi = self.sq_dict[tuple(i)]
+            def cmd(sq0, sqi):
+                self.paint_checkerboard()
+                sq0.change_photo(None)
+                fname = piece_to_fname(sq0.occupant.color_name)
+                sqi.change_photo(fname)
+                sqi.change_occupant(sq0.occupant)
+                sq0.change_occupant(None)
+                self.reset_move_commands()
+            sqi.set_command(partial(cmd, sq0, sqi))
+            
+    def reset_move_commands(self):
+        for square in self.squares:
+            cmd0 = partial(self.highlight_squares, square.index, self.moves(tuple(square.index)))
+            #square.config(command = cmd0)
+            square.set_command(cmd0)
+                
+                
+    def paint_checkerboard(self):
+        for i in range(8):
+            for j in range(8):
+                bg_color = self.board_color[(i%2+j%2)%2]
+                self.sq_dict[(i,j)].config(bg = bg_color)
     def moves(self, coords):#, friendlies, enemies):
         sq = self.sq_dict[tuple(coords)]
         out = []
@@ -139,61 +176,6 @@ class Board(ttk.Frame):
             out = [coords]
         
         return out
-    def highlight_squares(self, i0, indeces):
-        self.paint_checkerboard()
-        if indeces is not None:
-            for index in indeces:
-                sq = self.sq_dict[tuple(index)]
-                sq.config(bg = 'yellow')
-            self.enable_move(i0, indeces)
-        else:
-            pass
-    def enable_move(self, i0, indeces):
-        print(i0, indeces)
-        sq0 = self.sq_dict[tuple(i0)]
-        for i in indeces:
-            sqi = self.sq_dict[tuple(i)]
-            def cmd(sq0, sqi):
-                self.paint_checkerboard()
-                sq0.change_photo(None)
-                fname = piece_to_fname(sq0.occupant.color_name)
-                sqi.change_photo(fname)
-                sqi.change_occupant(sq0.occupant)
-                sq0.change_occupant(None)
-            sqi.config(command = partial(cmd, sq0, sqi))
-        
-        
-        
-        '''
-        sq0 = self.sq_dict[tuple(i0)]
-        for i in indeces:
-            def cmd():
-                print(1000)
-                self.paint_checkerboard()
-                sq0.config(image = tk.PhotoImage())
-                new_photo = tk.PhotoImage(file = piece_to_fname(sq0.occupant.color_name))
-                sqi.config(image = new_photo)
-                sqi.image = new_photo
-                sqi.change_occupant(sq0.occupant)
-                sq0.change_occupant(None)
-            sqi = self.sq_dict[tuple(i)]
-            self.old_commands[tuple(i)] = sqi.command
-            def cmd():
-                sq0.config(image = tk.PhotoImage())
-                sqi.config(image = tk.PhotoImage(file = piece_to_fname(sq0.occupant.color_name)))
-                sqi.change_occupant(sq0.occupant)
-                sq0.change_occupant(None)
-                
-            cmd0 = partial(cmd)
-            sqi.config(command = cmd0)
-            sqi.set_command(cmd0)
-            '''
-    def paint_checkerboard(self):
-        for i in range(8):
-            for j in range(8):
-                bg_color = self.board_color[(i%2+j%2)%2]
-                self.sq_dict[(i,j)].config(bg = bg_color)
-
 if __name__ == '__main__':
    
     root = tk.Tk()

@@ -33,7 +33,7 @@ class Square(tk.Button):
             
         self.image = photo
         self.grid(row=0,column=0)
-        self.command = None
+        self.command = None #self.command to be used later
     
     def change_occupant(self, new_occupant):
         if new_occupant is None:
@@ -49,6 +49,7 @@ class Square(tk.Button):
         self.config(image = photo)
         self.image = photo
     def set_command(self,cmd):
+        self.config(command = cmd)
         self.command = cmd
     
 if __name__ == '__main__':
