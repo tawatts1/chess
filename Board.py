@@ -116,7 +116,8 @@ class Board(ttk.Frame):
             def cmd(sq0, sqi):
                 self.paint_checkerboard()
                 sq0.change_photo(None)
-                fname = piece_to_fname(sq0.occupant[0])
+                fname = piece_to_fname(sq0.occupant)
+                #print(type(sq0.occupant))
                 sqi.change_photo(fname)
                 sqi.change_occupant(sq0.occupant)
                 sq0.change_occupant(None)
