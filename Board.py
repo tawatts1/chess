@@ -57,23 +57,25 @@ class Board(ttk.Frame):
         self.parent = parent
         self.squares = []
         self.board_color = board_color
-        self.board = self.setup_new_game()
+        self.board_sq, self.board_str = self.setup_new_game()
         self.grid(row=0, column=0)
         self.old_commands = {}
         
     def setup_new_game(self):
         board0 = []
+        boardstr = []
         self.sq_dict = {}
         self.blist = []
         self.wlist = []
         for i in range(8):
             row = []
+            rowstr = []
             for j in range(8):
                 full_name = index_to_piece([i,j])
                 fname = piece_to_fname(full_name)
                 coords0 = np.array([i,j])
                 if isinstance(full_name, str):
-                    occupant0 = Piece(full_name, coords0)
+                    occupant0 = full_name
                     # add to white or black list:
                     {'b':self.blist, 'w':self.wlist}[full_name[0]].append(coords0)
                 else: 
@@ -87,13 +89,15 @@ class Board(ttk.Frame):
                 self.squares.append(sq)
                 sq.grid(row=i, column=j)
                 row.append(sq)
+                rowstr.append(occupant0)
             board0.append(row)
+            boardstr.append(rowstr)
         for square in self.squares:
             cmd0 = partial(self.highlight_squares, square.index, self.moves(tuple(square.index)))
             #square.config(command = cmd0)
             square.set_command(cmd0)
         self.paint_checkerboard()
-        return board0
+        return board0, boardstr
     
     def highlight_squares(self, i0, indeces):
         self.paint_checkerboard()
@@ -112,7 +116,7 @@ class Board(ttk.Frame):
             def cmd(sq0, sqi):
                 self.paint_checkerboard()
                 sq0.change_photo(None)
-                fname = piece_to_fname(sq0.occupant.color_name)
+                fname = piece_to_fname(sq0.occupant[0])
                 sqi.change_photo(fname)
                 sqi.change_occupant(sq0.occupant)
                 sq0.change_occupant(None)
@@ -136,7 +140,7 @@ class Board(ttk.Frame):
         out = []
         if sq.occupant is None:
             return None
-        name = sq.occupant.name
+        name = sq.occupant[1]
         if coords is None:
             return None
         elif name is 'n':# Knight
@@ -173,7 +177,7 @@ class Board(ttk.Frame):
                         out.append(out0)
             
         elif name is 'p': # Pawn
-            sign = {'b':1,'w':-1}[sq.occupant.color]
+            sign = {'b':1,'w':-1}[sq.occupant[0]]
             for xy in [(sign,0), (sign,1),(sign,-1)]:
                 out0 = np.array(xy) + coords
                 if in_board_space(out0):
