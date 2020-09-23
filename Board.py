@@ -6,13 +6,19 @@ Created on Sun Sep 13 13:15:21 2020
 @author: ted
 """
 from Square import Square
-from Piece import Piece, in_board_space
+#from Piece import Piece, in_board_space
 import tkinter as tk
 from tkinter import ttk
 #import tkMessageBox
 from time import sleep
 import numpy as np
 from functools import partial 
+
+def in_board_space(xy, a=0,b=7):
+        if a-1 < xy[0] < b+1 and a-1 < xy[1] < b+1: 
+            return True
+        else: 
+            return False;
 
 def index_to_piece(index):
     if index[0] == 1:
