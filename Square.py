@@ -36,7 +36,7 @@ class Square(tk.Button):
         self.command = None #self.command to be used later
     
     def change_occupant(self, new_occupant):
-        self.occupant = None
+        self.occupant = new_occupant
     def change_photo(self, fname):
         if fname is not None:
             photo = tk.PhotoImage(file = fname)
