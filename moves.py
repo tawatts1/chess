@@ -18,9 +18,11 @@ def friendly_fire(sq_dict, coord0, coord_f):
     occ_f = sq_dict[tuple(coord_f)].occupant
     if occ_f is not None:
         if occ_0[0] == occ_f[0]:
-            ans = True
+            ans = 1
+        else:
+            ans = -1
     else:
-        ans = False
+        ans = 0
     return ans
 
 def moves(sq_dict, coords):#, friendlies, enemies):
@@ -41,31 +43,57 @@ def moves(sq_dict, coords):#, friendlies, enemies):
                     out.append(out0)
 
         elif name is 'b': # Bishop
-            for xy in [np.array([-1,1]), np.array([1,1])]:
-                for multiplier in range(-8,9):
-                    out0 = coords + multiplier*xy
-                    if in_board_space(out0) and not (out0 == coords).all() and not friendly_fire(sq_dict, coords, out0):
-                        out.append(out0)
+            for sign in [-1,1]:
+                for xy in [np.array([-1,1]), np.array([1,1])]:
+                    for multiplier in range(1,9):
+                        out0 = coords + sign*multiplier*xy
+                        if in_board_space(out0) and not (out0 == coords).all():
+                            fire = friendly_fire(sq_dict, coords, out0)
+                            if fire == 0:
+                                out.append(out0)
+                            elif fire == -1:
+                                out.append(out0)
+                                break
+                            elif fire == 1:
+                                break
 
         elif name is 'r': # Rook
-            for xy in [np.array([1,0]), np.array([0,1])]:
-                for multiplier in range(-8,9):
-                    out0 = coords + multiplier*xy
-                    if in_board_space(out0) and not (out0 == coords).all() and not friendly_fire(sq_dict, coords, out0):
-                        out.append(out0)
+            for sign in [-1,1]:
+                for xy in [np.array([1,0]), np.array([0,1])]:
+                    for multiplier in range(1,9):
+                        out0 = coords + sign*multiplier*xy
+                        if in_board_space(out0) and not (out0 == coords).all():
+                            fire = friendly_fire(sq_dict, coords, out0)
+                            if fire == 0:
+                                out.append(out0)
+                            elif fire == -1:
+                                out.append(out0)
+                                break
+                            elif fire == 1:
+                                break
+                            
         elif name is 'q': # Queen
-            for xy in [np.array([1,0]), np.array([0,1]),
-                       np.array([-1,1]), np.array([1,1])]:
-                for multiplier in range(-8,9):
-                    out0 = coords + multiplier*xy
-                    if in_board_space(out0) and not (out0 == coords).all() and not friendly_fire(sq_dict, coords, out0):
-                        out.append(out0)
+            for sign in [-1,1]:
+                for xy in [np.array([1,0]), np.array([0,1]),
+                           np.array([-1,1]), np.array([1,1])]:
+                    for multiplier in range(1,9):
+                        out0 = coords + sign*multiplier*xy
+                        if in_board_space(out0) and not (out0 == coords).all():
+                            fire = friendly_fire(sq_dict, coords, out0)
+                            if fire == 0:
+                                out.append(out0)
+                            elif fire == -1:
+                                out.append(out0)
+                                break
+                            elif fire == 1:
+                                break
         elif name is 'k':
             for x in range(-1,2):
                 for y in range(-1,2):
                     out0 = coords + np.array([x,y])
-                    if in_board_space(out0) and not (out0 == coords).all() and not friendly_fire(sq_dict, coords, out0):
-                        out.append(out0)
+                    if in_board_space(out0) and not (out0 == coords).all():
+                        if friendly_fire(sq_dict, coords, out0) in [0,-1]:
+                            out.append(out0)
 
         elif name is 'p': # Pawn
             sign = {'b':1,'w':-1}[sq.occupant[0]]
