@@ -12,12 +12,9 @@ from tkinter import ttk
 from time import sleep
 import numpy as np
 from functools import partial
+from moves import in_board_space, moves
 
-def in_board_space(xy, a=0,b=7):
-        if a-1 < xy[0] < b+1 and a-1 < xy[1] < b+1:
-            return True
-        else:
-            return False;
+
 
 def index_to_piece(index):
     if index[0] == 1:
@@ -33,6 +30,8 @@ def index_to_piece(index):
     else:
         return None
     return out
+
+
 def piece_to_fname(piece):
     if piece is None:
         return None
@@ -44,9 +43,6 @@ def piece_to_fname(piece):
 def index_to_fname(index, piece_f = piece_to_fname):
     return piece_f(  index_to_piece(index)  )
 
-
-def f1():
-    print('Default callback from board')
 
 class Board(ttk.Frame):
     def __init__(self, parent, piece_func = piece_to_fname,
@@ -130,7 +126,7 @@ class Board(ttk.Frame):
     def reset_move_commands(self):
         for i, square in enumerate(self.squares):
             cmd0 = partial(self.highlight_squares, square.index,
-                            self.moves(tuple(square.index)))
+                            moves(self.sq_dict, tuple(square.index)))
             square.set_command(cmd0)
 
 
@@ -139,60 +135,7 @@ class Board(ttk.Frame):
             for j in range(8):
                 bg_color = self.board_color[(i%2+j%2)%2]
                 self.sq_dict[(i,j)].config(bg = bg_color)
-    def moves(self, coords):#, friendlies, enemies):
-        sq = self.sq_dict[tuple(coords)]
-        out = []
-        if sq.occupant is None:
-            #print(coords)
-            return None
-        name = sq.occupant[1]
-        if coords is None:
-            print('No Moves')
-            return None
-        elif name is 'n':# Knight
-            for x,y in [(2,1),(2,-1), (1,2),(1,-2), (-1,2),(-1,-2), (-2,1),
-                        (-2,-1)]:
-                out0 = np.array([x,y]) + coords
-                if in_board_space(out0):
-                    out.append(out0)
-
-        elif name is 'b': # Bishop
-            for xy in [np.array([-1,1]), np.array([1,1])]:
-                for multiplier in range(-8,9):
-                    out0 = coords + multiplier*xy
-                    if in_board_space(out0) and not (out0 == coords).all():
-                        out.append(out0)
-
-        elif name is 'r': # Rook
-            for xy in [np.array([1,0]), np.array([0,1])]:
-                for multiplier in range(-8,9):
-                    out0 = coords + multiplier*xy
-                    if in_board_space(out0) and not (out0 == coords).all():
-                        out.append(out0)
-        elif name is 'q': # Queen
-            for xy in [np.array([1,0]), np.array([0,1]),
-                       np.array([-1,1]), np.array([1,1])]:
-                for multiplier in range(-8,9):
-                    out0 = coords + multiplier*xy
-                    if in_board_space(out0) and not (out0 == coords).all():
-                        out.append(out0)
-        elif name is 'k':
-            for x in range(-1,2):
-                for y in range(-1,2):
-                    out0 = coords + np.array([x,y])
-                    if in_board_space(out0) and not (out0 == coords).all():
-                        out.append(out0)
-
-        elif name is 'p': # Pawn
-            sign = {'b':1,'w':-1}[sq.occupant[0]]
-            for xy in [(sign,0), (sign,1),(sign,-1)]:
-                out0 = np.array(xy) + coords
-                if in_board_space(out0):
-                    out.append(out0)
-        else:
-            out = [coords]
-
-        return out
+    
 if __name__ == '__main__':
 
     root = tk.Tk()
