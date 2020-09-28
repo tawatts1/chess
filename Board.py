@@ -6,6 +6,8 @@ Created on Sun Sep 13 13:15:21 2020
 @author: ted
 """
 from Square import Square
+from Virtual_square import VSquare
+from Virtual_board import VBoard
 import tkinter as tk
 from tkinter import ttk
 #import tkMessageBox
@@ -14,21 +16,25 @@ import numpy as np
 from functools import partial
 from moves import in_board_space, moves
 from game_setup import piece_to_fname, standard_game
-
+from game_ai import random_move
 
 
 
 class Board(ttk.Frame):
     def __init__(self, parent, piece_func = piece_to_fname,
-                 board_color = {0:'grey',1:'brown'}):
+                 board_color = {0:'grey',1:'brown'}, 
+                 ai = random_move):
         super().__init__(parent)
 
         self.parent = parent
         #self.squares = []
         self.board_color = board_color
+        self.ai = ai
         self.setup_new_game()
         self.grid(row=0, column=0)
         self.old_commands = {}
+        self.turn = 'w'
+        
 
     def setup_new_game(self):
         self.board_sq, self.board_str, self.sq_dict = standard_game(self)
@@ -52,14 +58,29 @@ class Board(ttk.Frame):
             sqi = self.sq_dict[tuple(i)]
             def cmd(sq0, sqi):
                 self.paint_checkerboard()
-                sq0.change_photo(None)
-                fname = piece_to_fname(sq0.occupant)
-                sqi.change_photo(fname)
-                sqi.change_occupant(sq0.occupant)
-                sq0.change_occupant(None)
+                self.exchange_occ(i0,i)
                 self.reset_move_commands()
+                vb = VBoard(self.sq_dict)
+                print(vb)
+                
+                # have ai do its thing
+                c1, c2 = self.ai(vb, color = 'b')
+                self.exchange_occ(c1,c2)
+                
+                #self.sq_dict[tuple(c1)].invoke()
+                #self.sq_dict[tuple(c2)].invoke()
+                #input('test')
+                
             sqi.set_command(partial(cmd, sq0, sqi))
-
+            
+    def exchange_occ(self, c1, c2):
+        sq1 = self.sq_dict[tuple(c1)]
+        sq2 = self.sq_dict[tuple(c2)]
+        sq1.change_photo(None)
+        fname = piece_to_fname(sq1.occupant)
+        sq2.change_photo(fname)
+        sq2.change_occupant(sq1.occupant)
+        sq1.change_occupant(None)
     def reset_move_commands(self):
         for square in self.sq_dict.values():
             cmd0 = partial(self.highlight_squares, square.index,
@@ -72,6 +93,7 @@ class Board(ttk.Frame):
             for j in range(8):
                 bg_color = self.board_color[(i%2+j%2)%2]
                 self.sq_dict[(i,j)].config(bg = bg_color)
+        
     
 if __name__ == '__main__':
 

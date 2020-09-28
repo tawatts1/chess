@@ -109,7 +109,7 @@ def moves(sq_dict, coords):#, friendlies, enemies):
             if in_board_space(out0) and fire==friendly_fire(sq_dict, coords, out0):
                 out.append(out0)
     else:
-        out = [coords]
+        raise ValueError
 
     return out
 
