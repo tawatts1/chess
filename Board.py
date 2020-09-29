@@ -58,14 +58,26 @@ class Board(ttk.Frame):
             sqi = self.sq_dict[tuple(i)]
             def cmd(sq0, sqi):
                 self.paint_checkerboard()
-                self.exchange_occ(i0,i)
+                
+                
+                #sq1 = self.sq_dict[tuple(c1)]
+                #sq2 = self.sq_dict[tuple(c2)]
+                sq0.change_photo(None)
+                fname = piece_to_fname(sq0.occupant)
+                sqi.change_photo(fname)
+                sqi.change_occupant(sq0.occupant)
+                sq0.change_occupant(None)
+                
+                
+                
+                
                 self.reset_move_commands()
                 vb = VBoard(self.sq_dict)
                 print(vb)
                 
                 # have ai do its thing
-                c1, c2 = self.ai(vb, color = 'b')
-                self.exchange_occ(c1,c2)
+                #c1, c2 = self.ai(vb, color = 'b')
+                #self.exchange_occ(c1,c2)
                 
                 #self.sq_dict[tuple(c1)].invoke()
                 #self.sq_dict[tuple(c2)].invoke()
