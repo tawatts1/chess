@@ -61,14 +61,14 @@ class Board(ttk.Frame):
                 self.paint_checkerboard()
                 self.exchange_occ(c1,c2)
                 
-                self.reset_move_commands()
+                
                 vb = VBoard(self.sq_dict)
                 print(vb)
                 
                 # have ai do its thing
-                #c1, c2 = self.ai(vb, color = 'b')
-                #self.exchange_occ(c1,c2)
-                
+                c3, c4 = self.ai(vb, color = 'b')
+                self.exchange_occ(c3,c4)
+                self.reset_move_commands()
                 #self.sq_dict[tuple(c1)].invoke()
                 #self.sq_dict[tuple(c2)].invoke()
                 #input('test')
@@ -83,10 +83,10 @@ class Board(ttk.Frame):
         sq2.change_photo(fname)
         sq2.change_occupant(sq1.occupant)
         sq1.change_occupant(None)
-    def reset_move_commands(self):
+    def reset_move_commands(self, color = 'w'):
         for square in self.sq_dict.values():
             cmd0 = partial(self.highlight_squares, square.index,
-                            moves(self.sq_dict, tuple(square.index)))
+                            moves(self.sq_dict, tuple(square.index), color))
             square.set_command(cmd0)
 
 

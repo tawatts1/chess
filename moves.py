@@ -25,7 +25,7 @@ def friendly_fire(sq_dict, coord0, coord_f):
         ans = 0
     return ans
 
-def moves(sq_dict, coords):#, friendlies, enemies):
+def moves(sq_dict, coords, color):#, friendlies, enemies):
     '''
     This has all chess moves except:
         No two step pawn opening, 
@@ -40,6 +40,8 @@ def moves(sq_dict, coords):#, friendlies, enemies):
     name = sq.occupant[1]
     if coords is None:
         print('No Moves')
+        return None
+    if sq.occupant[0] != color:
         return None
     elif name is 'n':# Knight
         for x,y in [(2,1),(2,-1), (1,2),(1,-2), (-1,2),(-1,-2), (-2,1),

@@ -17,8 +17,8 @@ class VBoard():
         for sq in board_sq_dict.values():
             self.sq_dict[tuple(sq.index)] = VSquare(index = tuple(sq.index), occupant = sq.occupant)
         
-    def moves(self, coords):
-        return moves(self.sq_dict, coords)
+    def moves(self, coords, color = 'b'):
+        return moves(self.sq_dict, coords, color)
     def get_next_boards(self, color = 'b'):
         '''
         
