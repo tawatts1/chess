@@ -47,7 +47,7 @@ def moves(sq_dict, coords, color):#, friendlies, enemies):
         for x,y in [(2,1),(2,-1), (1,2),(1,-2), (-1,2),(-1,-2), (-2,1),
                     (-2,-1)]:
             out0 = np.array([x,y]) + coords
-            if in_board_space(out0) and not friendly_fire(sq_dict, coords, out0):
+            if in_board_space(out0) and friendly_fire(sq_dict, coords, out0) != 1:
                 out.append(out0)
 
     elif name is 'b': # Bishop
