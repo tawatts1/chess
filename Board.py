@@ -56,20 +56,10 @@ class Board(ttk.Frame):
         sq0 = self.sq_dict[tuple(i0)]
         for i in indeces:
             sqi = self.sq_dict[tuple(i)]
-            def cmd(sq0, sqi):
+            
+            def cmd(c1, c2):
                 self.paint_checkerboard()
-                
-                
-                #sq1 = self.sq_dict[tuple(c1)]
-                #sq2 = self.sq_dict[tuple(c2)]
-                sq0.change_photo(None)
-                fname = piece_to_fname(sq0.occupant)
-                sqi.change_photo(fname)
-                sqi.change_occupant(sq0.occupant)
-                sq0.change_occupant(None)
-                
-                
-                
+                self.exchange_occ(c1,c2)
                 
                 self.reset_move_commands()
                 vb = VBoard(self.sq_dict)
@@ -83,7 +73,7 @@ class Board(ttk.Frame):
                 #self.sq_dict[tuple(c2)].invoke()
                 #input('test')
                 
-            sqi.set_command(partial(cmd, sq0, sqi))
+            sqi.set_command(partial(cmd, i0, i))
             
     def exchange_occ(self, c1, c2):
         sq1 = self.sq_dict[tuple(c1)]
