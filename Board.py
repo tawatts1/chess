@@ -5,16 +5,14 @@ Created on Sun Sep 13 13:15:21 2020
 
 @author: ted
 """
-from Square import Square
-from Virtual_square import VSquare
+
 from Virtual_board import VBoard
 import tkinter as tk
 from tkinter import ttk
 #import tkMessageBox
 from time import sleep
-import numpy as np
 from functools import partial
-from moves import in_board_space, moves
+from moves import moves
 from game_setup import piece_to_fname, standard_game
 from game_ai import random_move
 
@@ -27,7 +25,6 @@ class Board(ttk.Frame):
         super().__init__(parent)
 
         self.parent = parent
-        #self.squares = []
         self.board_color = board_color
         self.ai = ai
         self.setup_new_game()
@@ -51,17 +48,14 @@ class Board(ttk.Frame):
             self.enable_move(i0, indeces)
         else:
             pass
+        
     def enable_move(self, i0, indeces):
-        #print(i0, indeces)
-        sq0 = self.sq_dict[tuple(i0)]
         for i in indeces:
             sqi = self.sq_dict[tuple(i)]
             
             def cmd(c1, c2):
                 self.paint_checkerboard()
                 self.exchange_occ(c1,c2)
-                
-                
                 vb = VBoard(self.sq_dict)
                 print(vb)
                 
@@ -69,9 +63,7 @@ class Board(ttk.Frame):
                 c3, c4 = self.ai(vb, color = 'b')
                 self.exchange_occ(c3,c4)
                 self.reset_move_commands()
-                #self.sq_dict[tuple(c1)].invoke()
-                #self.sq_dict[tuple(c2)].invoke()
-                #input('test')
+                
                 
             sqi.set_command(partial(cmd, i0, i))
             
