@@ -12,7 +12,7 @@ from tkinter import ttk
 #import tkMessageBox
 from time import sleep
 from functools import partial
-from moves import moves
+from moves0 import moves
 from game_setup import piece_to_fname, standard_game
 from game_ai import random_move
 
@@ -58,11 +58,13 @@ class Board(ttk.Frame):
                 self.exchange_occ(c1,c2)
                 vb = VBoard(self.sq_dict)
                 print(vb)
-                
+                self.change_turn()
                 # have ai do its thing
-                c3, c4 = self.ai(vb, color = 'b')
-                self.exchange_occ(c3,c4)
-                self.reset_move_commands()
+                if self.ai:
+                    c3, c4 = self.ai(vb, color = 'b')
+                    self.exchange_occ(c3,c4)
+                    self.change_turn()
+                self.reset_move_commands(color = self.turn)
                 
                 
             sqi.set_command(partial(cmd, i0, i))
@@ -87,7 +89,8 @@ class Board(ttk.Frame):
             for j in range(8):
                 bg_color = self.board_color[(i%2+j%2)%2]
                 self.sq_dict[(i,j)].config(bg = bg_color)
-        
+    def change_turn(self):
+        self.turn = {'b':'w','w':'b'}[self.turn]
     
 if __name__ == '__main__':
 

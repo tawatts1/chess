@@ -10,7 +10,7 @@ from Virtual_board import VBoard
 def random_move(board, color = 'b'):
     c1, c2, new_board = board.get_next_boards(color = color)[-1]
     return c1, c2
-    
+
 if __name__ == '__main__':
     
     

@@ -6,9 +6,10 @@ Created on Sun Sep 13 13:15:21 2020
 @author: ted
 """
 from Virtual_square import VSquare
+import sys
 
 import numpy as np
-from moves import in_board_space, moves
+#from moves import moves
 from game_setup import piece_to_fname, standard_game
 
 class VBoard():
@@ -18,6 +19,9 @@ class VBoard():
             self.sq_dict[tuple(sq.index)] = VSquare(index = tuple(sq.index), occupant = sq.occupant)
         
     def moves(self, coords, color = 'b'):
+        if 'moves' not in sys.modules:
+            from moves0 import moves
+            #print(sys.modules)
         return moves(self.sq_dict, coords, color)
     def get_next_boards(self, color = 'b'):
         '''
@@ -50,7 +54,7 @@ class VBoard():
         occ2 = self.sq_dict[tuple(c2)].occupant
         self.sq_dict[tuple(c1)].change_occupant(occ2)
         self.sq_dict[tuple(c2)].change_occupant(occ1)
-
+        return self
     def __str__(self):
         out = ''
         for i in range(8):
