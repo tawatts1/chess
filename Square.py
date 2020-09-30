@@ -16,7 +16,7 @@ class Square(tk.Button):
         super().__init__(parent)
         
         self.parent = parent
-        self.index = index
+        self.index = tuple(index)
         self.occupant = occupant
         
         if img is None:

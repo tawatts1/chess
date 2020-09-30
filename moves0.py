@@ -37,7 +37,7 @@ def in_check_after_move(sq_dict_before, c1, c2, color):
             if occ == color + 'k':
                 king_coord = sq.index
             if enemy_color == occ[0]:
-                enemy_moves.extend(moves(board1.sq_dict, sq.index, enemy_color))
+                enemy_moves.extend(moves_pre_check(board1.sq_dict, sq.index, enemy_color))
     if king_coord in enemy_moves:
         return True
     else:
@@ -52,91 +52,17 @@ def moves(sq_dict, coords, color):#, friendlies, enemies):
         no en passant, 
         and no bridging. 
     '''
-    sq = sq_dict[tuple(coords)]
+    dirty_moves = moves_pre_check(sq_dict, coords, color)
     out = []
-    if sq.occupant is None:
-        #print(coords)
+    if dirty_moves is None:
         return None
-    name = sq.occupant[1]
-    if coords is None:
-        print('No Moves')
-        return None
-    if sq.occupant[0] != color:
-        return None
-    elif name is 'n':# Knight
-        for x,y in [(2,1),(2,-1), (1,2),(1,-2), (-1,2),(-1,-2), (-2,1),
-                    (-2,-1)]:
-            out0 = np.array([x,y]) + coords
-            if in_board_space(out0) and friendly_fire(sq_dict, coords, out0) != 1:
-                out.append(tuple(out0))
-
-    elif name is 'b': # Bishop
-        for sign in [-1,1]:
-            for xy in [np.array([-1,1]), np.array([1,1])]:
-                for multiplier in range(1,9):
-                    out0 = coords + sign*multiplier*xy
-                    if in_board_space(out0):
-                        fire = friendly_fire(sq_dict, coords, out0)
-                        if fire == 0:
-                            out.append(tuple(out0))
-                        elif fire == -1:
-                            out.append(tuple(out0))
-                            break
-                        elif fire == 1:
-                            break
-
-    elif name is 'r': # Rook
-        for sign in [-1,1]:
-            for xy in [np.array([1,0]), np.array([0,1])]:
-                for multiplier in range(1,9):
-                    out0 = coords + sign*multiplier*xy
-                    if in_board_space(out0):
-                        fire = friendly_fire(sq_dict, coords, out0)
-                        if fire == 0:
-                            out.append(tuple(out0))
-                        elif fire == -1:
-                            out.append(tuple(out0))
-                            break
-                        elif fire == 1:
-                            break
-                        
-    elif name is 'q': # Queen
-        for sign in [-1,1]:
-            for xy in [np.array([1,0]), np.array([0,1]),
-                       np.array([-1,1]), np.array([1,1])]:
-                for multiplier in range(1,9):
-                    out0 = coords + sign*multiplier*xy
-                    if in_board_space(out0):
-                        fire = friendly_fire(sq_dict, coords, out0)
-                        if fire == 0:
-                            out.append(tuple(out0))
-                        elif fire == -1:
-                            out.append(tuple(out0))
-                            break
-                        elif fire == 1:
-                            break
-    elif name is 'k':
-        for sign in [-1,1]:
-            for xy in [np.array([1,0]), np.array([0,1]),
-                       np.array([-1,1]), np.array([1,1])]:
-                out0 = coords + sign*xy
-                if in_board_space(out0):
-                    if friendly_fire(sq_dict, coords, out0) in [0,-1]:
-                        if not in_check_after_move(sq_dict, coords, tuple(out0), color):
-                            out.append(tuple(out0))
-
-    elif name is 'p': # Pawn
-        sign = {'b':1,'w':-1}[sq.occupant[0]]
-        for move,fire in [[(sign,0), 0], [(sign,1),-1],[(sign,-1),-1]]:
-            out0 = np.array(move) + coords
-            if in_board_space(out0) and fire==friendly_fire(sq_dict, coords, out0):
-                out.append(tuple(out0))
     else:
-        raise ValueError
-
+        for mv in dirty_moves:
+            if not in_check_after_move(sq_dict, coords, mv, color):
+                out.append(mv)
     return out
 
-def moves_for_check(sq_dict, coords, color):#, friendlies, enemies):
+def moves_pre_check(sq_dict, coords, color):#, friendlies, enemies):
     '''
     This has all chess moves except:
         No two step pawn opening, 

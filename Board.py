@@ -47,7 +47,7 @@ class Board(ttk.Frame):
                 sq.config(bg = 'yellow')
             self.enable_move(i0, indeces)
         else:
-            pass
+            self.reset_move_commands(color = self.turn)
         
     def enable_move(self, i0, indeces):
         for i in indeces:
@@ -57,14 +57,18 @@ class Board(ttk.Frame):
                 self.paint_checkerboard()
                 self.exchange_occ(c1,c2)
                 vb = VBoard(self.sq_dict)
-                print(vb)
+                #print(vb)
                 self.change_turn()
+                self.parent.update()
+                
                 # have ai do its thing
                 if self.ai:
                     c3, c4 = self.ai(vb, color = 'b')
+                    
                     self.exchange_occ(c3,c4)
                     self.change_turn()
                 self.reset_move_commands(color = self.turn)
+                
                 
                 
             sqi.set_command(partial(cmd, i0, i))
@@ -77,6 +81,7 @@ class Board(ttk.Frame):
         sq2.change_photo(fname)
         sq2.change_occupant(sq1.occupant)
         sq1.change_occupant(None)
+        print(c1, ' --> ', c2)
     def reset_move_commands(self, color = 'w'):
         for square in self.sq_dict.values():
             cmd0 = partial(self.highlight_squares, square.index,
