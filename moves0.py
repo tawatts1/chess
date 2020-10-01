@@ -47,7 +47,7 @@ def in_check_after_move(sq_dict_before, c1, c2, color):
     return out
 
 def in_checkmate(board, color):
-    mvs = board.get_next_boards()
+    mvs = board.get_next_boards(color)
     incheck = in_check(board, color)
     if len(mvs) == 0 and incheck:
         print(color + ' loses! Sucks to suck!')

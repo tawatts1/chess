@@ -18,12 +18,12 @@ class VBoard():
         for sq in board_sq_dict.values():
             self.sq_dict[tuple(sq.index)] = VSquare(index = tuple(sq.index), occupant = sq.occupant)
         
-    def moves(self, coords, color = 'b'):
+    def moves(self, coords, color):
         if 'moves' not in sys.modules:
             from moves0 import moves
             #print(sys.modules)
         return moves(self.sq_dict, coords, color)
-    def get_next_boards(self, color = 'b'):
+    def get_next_boards(self, color):
         '''
         
         
@@ -42,7 +42,7 @@ class VBoard():
             for j in range(8):
                 occ = self.sq_dict[(i,j)].occupant
                 if occ is not None and occ[0] == color:
-                    mvs = self.moves((i,j))
+                    mvs = self.moves((i,j), color)
                     for move in mvs:
                         board_1 = VBoard(self.sq_dict.copy())
                         board_1.execute_move((i,j), move)
