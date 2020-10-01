@@ -109,5 +109,5 @@ if __name__ == '__main__':
 
     root = tk.Tk()
     #root.protocol("WM_DELETE_WINDOW", quit_window())
-    b1 = Board(root, ai = False)
+    b1 = Board(root)
     root.mainloop()
