@@ -45,14 +45,14 @@ class VBoard():
                     mvs = self.moves((i,j))
                     for move in mvs:
                         board_1 = VBoard(self.sq_dict.copy())
-                        board_1.exchange_squares((i,j), move)
+                        board_1.execute_move((i,j), move)
                         out.append([(i,j),move,board_1])
         return out
         
-    def exchange_squares(self, c1, c2):
+    def execute_move(self, c1, c2):
         occ1 = self.sq_dict[tuple(c1)].occupant
-        occ2 = self.sq_dict[tuple(c2)].occupant
-        self.sq_dict[tuple(c1)].change_occupant(occ2)
+        #occ2 = self.sq_dict[tuple(c2)].occupant
+        self.sq_dict[tuple(c1)].change_occupant(None)
         self.sq_dict[tuple(c2)].change_occupant(occ1)
         return self
     def __str__(self):

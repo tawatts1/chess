@@ -55,7 +55,7 @@ class Board(ttk.Frame):
             
             def cmd(c1, c2):
                 self.paint_checkerboard()
-                self.exchange_occ(c1,c2)
+                self.execute_sq_move(c1,c2)
                 vb = VBoard(self.sq_dict)
                 #print(vb)
                 self.change_turn()
@@ -65,7 +65,7 @@ class Board(ttk.Frame):
                 if self.ai:
                     c3, c4 = self.ai(vb, color = 'b')
                     
-                    self.exchange_occ(c3,c4)
+                    self.execute_sq_move(c3,c4)
                     self.change_turn()
                 self.reset_move_commands(color = self.turn)
                 
@@ -73,7 +73,7 @@ class Board(ttk.Frame):
                 
             sqi.set_command(partial(cmd, i0, i))
             
-    def exchange_occ(self, c1, c2):
+    def execute_sq_move(self, c1, c2):
         sq1 = self.sq_dict[tuple(c1)]
         sq2 = self.sq_dict[tuple(c2)]
         sq1.change_photo(None)

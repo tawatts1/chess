@@ -30,7 +30,11 @@ def in_check_after_move(sq_dict_before, c1, c2, color):
     king_coord = (0,0)
     enemy_moves = []
     enemy_color = {'b':'w','w':'b'}[color]
-    board1 = VBoard(sq_dict_before).exchange_squares(c1,c2)
+    board1 = VBoard(sq_dict_before).execute_move(c1,c2)
+    '''
+    out = in_check(board1, color)
+    return out
+    '''
     for sq in board1.sq_dict.values():
         occ = sq.occupant
         if occ is not None:
@@ -43,7 +47,21 @@ def in_check_after_move(sq_dict_before, c1, c2, color):
     else:
         return False
     
-    
+def in_check(board, color):
+    king_coord = (0,0)
+    enemy_moves = []
+    enemy_color = {'b':'w','w':'b'}[color]
+    for sq in board.sq_dict.values():
+        occ = sq.occupant
+        if occ is not None:
+            if occ == color + 'k':
+                king_coord = sq.index
+            if enemy_color == occ[0]:
+                enemy_moves.extend(moves_pre_check(board.sq_dict, sq.index, enemy_color))
+    if king_coord in enemy_moves:
+        return True
+    else:
+        return False
 
 def moves(sq_dict, coords, color):#, friendlies, enemies):
     '''
