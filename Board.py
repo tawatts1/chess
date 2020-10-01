@@ -14,14 +14,14 @@ from time import sleep
 from functools import partial
 from moves0 import moves, in_checkmate, special_move
 from game_setup import piece_to_fname, standard_game
-from game_ai import random_move
+from game_ai import ai_move
 
 
 
 class Board(ttk.Frame):
     def __init__(self, parent, piece_func = piece_to_fname,
                  board_color = {0:'grey',1:'brown'}, 
-                 ai = random_move):
+                 ai = ai_move):
         super().__init__(parent)
 
         self.parent = parent
