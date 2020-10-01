@@ -12,7 +12,7 @@ from tkinter import ttk
 #import tkMessageBox
 from time import sleep
 from functools import partial
-from moves0 import moves
+from moves0 import moves, in_checkmate
 from game_setup import piece_to_fname, standard_game
 from game_ai import random_move
 
@@ -54,20 +54,27 @@ class Board(ttk.Frame):
             sqi = self.sq_dict[tuple(i)]
             
             def cmd(c1, c2):
+                #vb = VBoard(self.sq_dict)
+                #if not in_checkmate(vb, self.turn):
                 self.paint_checkerboard()
                 self.execute_sq_move(c1,c2)
                 vb = VBoard(self.sq_dict)
-                #print(vb)
+                print(vb)
                 self.change_turn()
-                self.parent.update()
-                
-                # have ai do its thing
-                if self.ai:
-                    c3, c4 = self.ai(vb, color = 'b')
+                if not in_checkmate(vb, self.turn):
+                    self.parent.update()
                     
-                    self.execute_sq_move(c3,c4)
-                    self.change_turn()
-                self.reset_move_commands(color = self.turn)
+                    # have ai do its thing
+                    if self.ai:
+                        c3, c4 = self.ai(vb, color = 'b')
+                        
+                        self.execute_sq_move(c3,c4)
+                        vb = VBoard(self.sq_dict)
+                        self.change_turn()
+                        if in_checkmate(vb, self.turn):
+                            self.parent.update()
+                            sleep(1)
+                    self.reset_move_commands(color = self.turn)
                 
                 
                 
