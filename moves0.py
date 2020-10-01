@@ -26,7 +26,17 @@ def friendly_fire(sq_dict, coord0, coord_f):
         ans = 0
     return ans
 
-
+def special_move(sq_dict, c1,c2):
+    piece = sq_dict[c1].occupant
+    if piece[1] == 'p':
+        if piece[0] == 'b' and c1[0] == 6 and c2[0] == 7:
+            print('promotion')
+            return 'promotion'
+        elif piece[0] == 'w' and c1[0] == 1 and c2[0] == 0:
+            print('promotion')
+            return 'promotion'
+    return None
+    
 def in_check_after_move(sq_dict_before, c1, c2, color):
     king_coord = (0,0)
     enemy_moves = []

@@ -12,7 +12,7 @@ from tkinter import ttk
 #import tkMessageBox
 from time import sleep
 from functools import partial
-from moves0 import moves, in_checkmate
+from moves0 import moves, in_checkmate, special_move
 from game_setup import piece_to_fname, standard_game
 from game_ai import random_move
 
@@ -54,26 +54,23 @@ class Board(ttk.Frame):
             sqi = self.sq_dict[tuple(i)]
             
             def cmd(c1, c2):
-                #vb = VBoard(self.sq_dict)
-                #if not in_checkmate(vb, self.turn):
-                self.paint_checkerboard()
-                self.execute_sq_move(c1,c2)
                 vb = VBoard(self.sq_dict)
-                print(vb)
-                self.change_turn()
                 if not in_checkmate(vb, self.turn):
-                    self.parent.update()
-                    
-                    # have ai do its thing
-                    if self.ai:
-                        c3, c4 = self.ai(vb, color = 'b')
+                    self.paint_checkerboard()
+                    self.execute_sq_move(c1,c2)
+                    vb = VBoard(self.sq_dict)
+                    print(vb)
+                    self.change_turn()
+                    if not in_checkmate(vb, self.turn):
+                        self.parent.update()
                         
-                        self.execute_sq_move(c3,c4)
-                        vb = VBoard(self.sq_dict)
-                        self.change_turn()
-                        if in_checkmate(vb, self.turn):
-                            self.parent.update()
-                            sleep(1)
+                        # have ai do its thing
+                        if self.ai:
+                            c3, c4 = self.ai(vb, color = 'b')
+                            
+                            self.execute_sq_move(c3,c4)
+                            vb = VBoard(self.sq_dict)
+                            self.change_turn()
                     self.reset_move_commands(color = self.turn)
                 
                 
@@ -83,6 +80,10 @@ class Board(ttk.Frame):
     def execute_sq_move(self, c1, c2):
         sq1 = self.sq_dict[tuple(c1)]
         sq2 = self.sq_dict[tuple(c2)]
+        spc_mv = special_move(self.sq_dict, c1, c2)
+        if spc_mv == 'promotion':
+            sq1.occupant = sq1.occupant[0] + 'q'
+        
         sq1.change_photo(None)
         fname = piece_to_fname(sq1.occupant)
         sq2.change_photo(fname)
@@ -108,5 +109,5 @@ if __name__ == '__main__':
 
     root = tk.Tk()
     #root.protocol("WM_DELETE_WINDOW", quit_window())
-    b1 = Board(root)
+    b1 = Board(root, ai = False)
     root.mainloop()
