@@ -7,7 +7,6 @@ Created on Fri Sep 25 19:59:05 2020
 """
 from Virtual_board import VBoard
 from time import sleep
-from time_heavy_functions import t1
 from random import choice
 
 def random_move(board, color = 'b'):
@@ -18,4 +17,3 @@ if __name__ == '__main__':
     
     
     pass
-
