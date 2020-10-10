@@ -45,15 +45,42 @@ def in_check_after_move(sq_dict_before, c1, c2, color):
     
     out = in_check(board1, color)
     return out
-
+def pre_score(board, color):
+    return None
+    score = None
+    enemy_color = {'b':'w','w':'b'}[color]
+    mvs0 = board.get_next_boards(color)
+    mvs1 = board.get_next_boards(enemy_color)
+    if len(mvs0)==0:
+        if in_check(board, color):
+            return -np.inf
+        else:
+            return 0
+    elif len(mvs1)==0:
+        if in_check(board, enemy_color):
+            return np.inf
+        else:
+            return 0
+    else:
+        return None
+    
 def in_checkmate(board, color):
     mvs = board.get_next_boards(color)
     incheck = in_check(board, color)
     if len(mvs) == 0 and incheck:
-        print(color + ' loses! Sucks to suck!')
+        #print(color + ' loses! Sucks to suck!')
         return True
     else:
         return False
+def in_stalemate(board):
+    mvs = board.get_next_boards('w')
+    mvs2 = board.get_next_boards('b')
+    #incheck = in_check(board, color)
+    if len(mvs)+len(mvs2) == 0: #and incheck:
+        #print('Stalemate')
+        return True
+    else:
+        return False 
 def in_check(board, color):
     king_coord = (0,0)
     enemy_moves = []
