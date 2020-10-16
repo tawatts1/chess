@@ -82,10 +82,11 @@ def two_step_random(board, color):
     return choice(best_moves)
 def recursive_manager(board, color):
     t0 = time()
+    print('color: ' + color)
     out = two_step_recursive(board, color, -inf, 1)
     print('time: ', time()-t0)
     print(out)
-    return choice(out[0])
+    return out[0][0]
 def two_step_recursive(board, color, lower_limit, pairs_left):
     enemy_color = {'b':'w','w':'b'}[color]
     pl = pairs_left-1

@@ -48,7 +48,16 @@ class VBoard():
                         board_1.execute_move((i,j), move)
                         out.append([(i,j),move,board_1])
         return out
+    def has_move(self, color):
+        for i in range(8):
+            for j in range(8):
+                occ = self.sq_dict[(i,j)].occupant
+                if occ is not None and occ[0] == color:
+                    mvs = self.moves((i,j), color)
+                    if len(mvs)>0:
+                        return True
         
+        return False
     def execute_move(self, c1, c2):
         occ1 = self.sq_dict[tuple(c1)].occupant
         #occ2 = self.sq_dict[tuple(c2)].occupant

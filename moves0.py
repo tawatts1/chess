@@ -47,16 +47,13 @@ def in_check_after_move(sq_dict_before, c1, c2, color):
     return out
 def pre_score(board, color):
     return None
-    score = None
     enemy_color = {'b':'w','w':'b'}[color]
-    mvs0 = board.get_next_boards(color)
-    mvs1 = board.get_next_boards(enemy_color)
-    if len(mvs0)==0:
+    if not board.has_move(color):
         if in_check(board, color):
             return -np.inf
         else:
             return 0
-    elif len(mvs1)==0:
+    elif not board.has_move(enemy_color):
         if in_check(board, enemy_color):
             return np.inf
         else:
