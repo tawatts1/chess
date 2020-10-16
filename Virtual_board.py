@@ -29,9 +29,8 @@ class VBoard():
         
         Parameters
         ----------
-        color : string, optional
-            Color that can move, either 'b' or 'w'. The default is 'b'.
-
+        color : string
+            Color that can move, either 'b' or 'w'. 
         Returns
         -------
         All of the possible virtual board configurations after one move by the color.
