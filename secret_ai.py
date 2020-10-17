@@ -8,7 +8,8 @@ Created on Wed Sep 30 22:40:28 2020
 import tkinter as tk
 from random import choice
 from Board import Board
-from moves0 import in_checkmate, in_stalemate, pre_score
+from Virtual_board_mem import VBoard_m
+from moves_mem import in_checkmate, in_stalemate, pre_score
 from numpy import inf
 from time import time
 
@@ -30,10 +31,11 @@ def board_score(board, color):
     if ps is not None:
         score = ps
     else:
-        for sq in board.sq_dict.values():
-            occ = sq.occupant
-            if occ is not None:
-                score += sign[occ[0]]*value[occ[1]]
+        for i in range(8):
+            for j in range(8):
+                occ = board.rsq_dict[i][j]
+                if occ is not None:
+                    score += sign[occ[0]]*value[occ[1]]
     #print(score)
     return score
 '''
@@ -41,22 +43,25 @@ def two_step(board, color):
     enemy_color = {'b':'w','w':'b'}[color]
     #one_step_boards = board.get_next_boards(color = color)
     lower_limit = -inf
-    best_move = None
+    best_move = None 
+    i = 0
     for c1, c2, board1 in board.get_next_boards(color):
+        i +=1
         wcs = inf # if the worst is worse than the lower limit, don't go
-        scores_list = []
+        #scores_list = []
         for c3, c4,board2 in board1.get_next_boards(enemy_color):
             score_2 = board_score(board2, color)
-            scores_list.append(score_2)
+            #scores_list.append(score_2)
             if score_2 < wcs:
                 wcs = score_2
             if wcs < lower_limit:
                 break
-        if wcs > lower_limit:
-            best_move = (c1,c2)
-            lower_limit = wcs
+        else: 
+            if wcs > lower_limit:
+                best_move = (c1,c2)
+                lower_limit = wcs
     return best_move
-'''
+
 def two_step_random(board, color):
     enemy_color = {'b':'w','w':'b'}[color]
     #one_step_boards = board.get_next_boards(color = color)
@@ -80,10 +85,12 @@ def two_step_random(board, color):
             best_moves = [best_move]
             lower_limit = wcs
     return choice(best_moves)
+'''
 def recursive_manager(board, color):
     t0 = time()
     print('color: ' + color)
-    out = two_step_recursive(board, color, -inf, 1)
+    vb_m = VBoard_m(board.sq_dict, None)
+    out = two_step_recursive(vb_m, color, -inf, 2)
     print('time: ', time()-t0)
     print(out)
     return out[0][0]
@@ -129,76 +136,13 @@ def two_step_recursive(board, color, lower_limit, pairs_left):
                 LL = wcs
         return out, LL
             
-                
-'''
-def four_step(board, color):
-    t0 = time()
-    enemy_color = {'b':'w','w':'b'}[color]
-    lower_limit = -inf
-    best_move = None
-    best_moves = []
-    for c1, c2, board1 in board.get_next_boards(color):
-        print('partial: ',time()-t0)
-        for c3, c4,board2 in board1.get_next_boards(enemy_color):
-            for c5,c6,board3 in board2.get_next_boards(color):
-                scores_f = []
-                for c7,c8, board4 in board3.get_next_boards(enemy_color):
-                    score = board_score(board4,color)
-                    scores_f.append(score)
-                wcs = min(scores_f)
-                if wcs > lower_limit:
-                    lower_limit = wcs
-                    best_moves = [(c1,c2)]
-                elif wcs == lower_limit and not (c1,c2) in best_moves:
-                    best_moves.append((c1,c2))
-    print(time()-t0)
-    return choice(best_moves)
-'''
-def four_step_enhanced(board, color):
-    t0 = time()
-    enemy_color = {'b':'w','w':'b'}[color]
-    lower_limit = -inf
-    best_move = None
-    best_moves = []
-    bs0 = board_score(board, color)
-    for c1, c2, board1 in board.get_next_boards(color):
-        bs1 = board_score(board1)
-        print('partial: ',time()-t0)
-        for c3, c4,board2 in board1.get_next_boards(enemy_color):
-            bs2 = board_score(board2)
-            if bs2 - bs0 <= -3: 
-                break
-            for c5,c6,board3 in board2.get_next_boards(color):
-                scores_f = []
-                for c7,c8, board4 in board3.get_next_boards(enemy_color):
-                    score = board_score(board4,color)
-                    scores_f.append(score)
-                wcs = min(scores_f)
-                if wcs > lower_limit:
-                    lower_limit = wcs
-                    best_moves = [(c1,c2)]
-                elif wcs == lower_limit and not (c1,c2) in best_moves:
-                    best_moves.append((c1,c2))
-    print(time()-t0)
-    return choice(best_moves)
-
-
 def get_occ_color(board, coords):
-    occ = board.sq_dict[tuple(coords)].occupant
+    occ = board.rsq_dict[coords[0]][coords[1]]
     if occ is None:
         return None
     else:
         return occ[0]
-def agressive_ai(board, color):
-    out = []
-    mvs = board.get_next_boards(color = color)
-    for c1, c2, new_board in mvs:
-        if get_occ_color(board, c2) == {'b':'w','w':'b'}[color]:
-            out.append([c1,c2,new_board])
-    if len(out) == 0:
-        out = mvs
-    c3, c4, new_board1 = choice(out)    
-    return c3, c4
+
 
 if __name__ == '__main__':
     
