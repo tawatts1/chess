@@ -15,7 +15,7 @@ from game_setup import piece_to_fname, standard_game
 class VBoard_m():
     def __init__(self, board_sq_dict, row_sq_dict):
         if row_sq_dict:
-            self.rsq_dict = row_sq_dict
+            self.rsq_dict = row_sq_dict#.copy()
         elif board_sq_dict:
             self.rsq_dict = {}
             for i in range(8):
@@ -49,10 +49,11 @@ class VBoard_m():
                 occ = self.rsq_dict[i][j]
                 if occ is not None and occ[0] == color:
                     mvs = self.moves((i,j), color)
-                    for move in mvs:
-                        board_1 = VBoard_m(None, self.rsq_dict)
-                        board_1.execute_move((i,j), move)
-                        out.append([(i,j),move,board_1])
+                    if len(mvs)>0:
+                        for move in mvs:
+                            board_1 = VBoard_m(None, self.rsq_dict)
+                            board_1.execute_move((i,j), move)
+                            out.append([(i,j),move,board_1])
         return out
     def has_move(self, color):
         for i in range(8):

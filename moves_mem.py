@@ -100,13 +100,12 @@ def moves_m(rsq_dict, coords, color):#, friendlies, enemies):
         and no bridging. 
     '''
     dirty_moves = moves_pre_check(rsq_dict, coords, color)
+    #return dirty_moves
     out = []
-    if dirty_moves is None:
-        return None
-    else:
-        for mv in dirty_moves:
-            if not in_check_after_move(rsq_dict, coords, mv, color):
-                out.append(mv)
+
+    for mv in dirty_moves:
+        if not in_check_after_move(rsq_dict, coords, mv, color):
+            out.append(mv)
     return out
 
 def moves_pre_check(rsq_dict, coords, color):#, friendlies, enemies):
@@ -156,6 +155,11 @@ def moves_pre_check(rsq_dict, coords, color):#, friendlies, enemies):
                     out0 = coords + sign*multiplier*xy
                     if in_board_space(out0):
                         fire = friendly_fire(rsq_dict, coords, out0)
+                        '''
+                        if tuple(out0) == (0,6):
+                            print('in 0,6')
+                            print(fire, coords, out0)
+                        '''
                         if fire == 0:
                             out.append(tuple(out0))
                         elif fire == -1:
@@ -193,6 +197,7 @@ def moves_pre_check(rsq_dict, coords, color):#, friendlies, enemies):
             if in_board_space(out0) and fire==friendly_fire(rsq_dict, coords, out0):
                 out.append(tuple(out0))
     else:
+        print('unexpected piece type')
         raise ValueError
 
     return out
@@ -201,7 +206,27 @@ def moves_pre_check(rsq_dict, coords, color):#, friendlies, enemies):
 
 
 if __name__ == '__main__':
-    
-    
-    pass
+    from game_setup import index_to_piece
+    '''
+    import os
+    import psutil
+    process = psutil.Process(os.getpid())
+    print(process.memory_info().vms*10**-6)  # in bytes 
+    '''
+    sqd = {}
+    for i in range(8):
+        row = []
+        for j in range(8):
+            row.append(index_to_piece((i,j)))
+        sqd[i] = row
+    vbm = VBoard_m(None, sqd)
+    print(vbm)
+    ccb = vbm.get_next_boards('b')
+    for c1,c2, board in ccb:
+        print(c1, c2)
+    print(len(ccb))
+    #vbm.execute_move((7,6),(5,5))
+    vbm.execute_move((0,6),(2,5))
+    print(vbm)
+    #print(process.memory_info().vms*10**-6)
 

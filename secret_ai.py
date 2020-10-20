@@ -12,6 +12,10 @@ from Virtual_board_mem import VBoard_m
 from moves_mem import in_checkmate, in_stalemate, pre_score
 from numpy import inf
 from time import time
+import os
+import psutil
+process = psutil.Process(os.getpid())
+print(process.memory_info().vms*10**-6)  # in bytes 
 
 def board_score(board, color):
     enemy_color = {'b':'w','w':'b'}[color]
@@ -87,10 +91,12 @@ def two_step_random(board, color):
     return choice(best_moves)
 '''
 def recursive_manager(board, color):
+    global process
+    print(process.memory_info().vms*10**-6)  # in bytes 
     t0 = time()
     print('color: ' + color)
     vb_m = VBoard_m(board.sq_dict, None)
-    out = two_step_recursive(vb_m, color, -inf, 2)
+    out = two_step_recursive(vb_m, color, -inf, 1)
     print('time: ', time()-t0)
     print(out)
     return out[0][0]
@@ -102,6 +108,7 @@ def two_step_recursive(board, color, lower_limit, pairs_left):
     if pl == 0:
         for c1, c2, board1 in board.get_next_boards(color):
             wcs = inf
+            print(board1)
             for c3, c4, board2 in board1.get_next_boards(enemy_color):
                 score2 = board_score(board2, color)
                 if score2<wcs:
