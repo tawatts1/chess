@@ -36,7 +36,7 @@ def special_move(sq_dict, c1,c2):
             print('promotion')
             return 'promotion'
     return None
-
+'''
 def in_check_after_move(rsq_dict_before, c1, c2, color):
     board1 = VBoard_m(None, rsq_dict_before).execute_move(c1,c2)
     out = in_check(board1, color)
@@ -91,7 +91,7 @@ def in_check(board, color):
         return True
     else:
         return False
-
+'''
 def moves_m(rsq_dict, coords, color):#, friendlies, enemies):
     '''
     This has all chess moves except:
@@ -104,7 +104,7 @@ def moves_m(rsq_dict, coords, color):#, friendlies, enemies):
     out = []
 
     for mv in dirty_moves:
-        if not in_check_after_move(rsq_dict, coords, mv, color):
+        if not False: #in_check_after_move(rsq_dict, coords, mv, color): !!!
             out.append(mv)
     return out
 
