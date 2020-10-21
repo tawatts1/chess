@@ -9,7 +9,7 @@ import tkinter as tk
 from random import choice
 from Board import Board
 from Virtual_board_mem import VBoard_m
-#from moves_mem import in_checkmate, in_stalemate, pre_score
+from moves_mem import pre_score
 from numpy import inf
 from time import time
 import os
@@ -31,7 +31,7 @@ def board_score(board, color):
     if in_stalemate(board):
         score = 0
     '''
-    ps = None#pre_score(board, color) !!!
+    ps = pre_score(board, color)
     if ps is not None:
         score = ps
     else:
@@ -96,7 +96,7 @@ def recursive_manager(board, color):
     t0 = time()
     print('color: ' + color)
     vb_m = VBoard_m(board.sq_dict, None)
-    out = two_step_recursive(vb_m, color, -inf, 2)
+    out = two_step_recursive(vb_m, color, -inf, 1)
     print('time: ', time()-t0)
     print(out)
     return out[0][0]
