@@ -100,7 +100,7 @@ def moves_m(rsq_dict, coords, color):#, friendlies, enemies):
         and no bridging. 
     '''
     dirty_moves = moves_pre_check(rsq_dict, coords, color)
-    #return dirty_moves
+    return dirty_moves
     out = []
 
     for mv in dirty_moves:

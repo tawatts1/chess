@@ -20,7 +20,7 @@ print(process.memory_info().vms*10**-6)  # in bytes
 def board_score(board, color):
     enemy_color = {'b':'w','w':'b'}[color]
     sign = {color:1, enemy_color:-1}
-    value = {'p':1,'b':3,'n':3,'r':5,'q':9,'k':0}
+    value = {'p':1,'b':3,'n':3,'r':5,'q':9,'k':inf}
     score = 0
     '''
     if in_checkmate(board, color):
@@ -31,7 +31,7 @@ def board_score(board, color):
     if in_stalemate(board):
         score = 0
     '''
-    ps = pre_score(board, color)
+    ps = None#pre_score(board, color)
     if ps is not None:
         score = ps
     else:
@@ -96,7 +96,7 @@ def recursive_manager(board, color):
     t0 = time()
     print('color: ' + color)
     vb_m = VBoard_m(board.sq_dict, None)
-    out = two_step_recursive(vb_m, color, -inf, 1)
+    out = two_step_recursive(vb_m, color, -inf, 2)
     print('time: ', time()-t0)
     print(out)
     return out[0][0]
