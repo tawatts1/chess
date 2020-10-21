@@ -15,7 +15,14 @@ from game_setup import piece_to_fname, standard_game
 class VBoard_m():
     def __init__(self, board_sq_dict, row_sq_dict):
         if row_sq_dict:
-            self.rsq_dict = row_sq_dict#.copy()
+            #this is necessary because setting a dict outright equal is different
+            #than setting every element equal to every element. 
+            #Because the elements are lists there will be two different board types
+            #with rows that have the same elements, and they will be referencing the 
+            #same memory location!
+            self.rsq_dict = {}
+            for i in range(8):
+                self.rsq_dict[i] = row_sq_dict[i]#.copy()
         elif board_sq_dict:
             self.rsq_dict = {}
             for i in range(8):
@@ -69,18 +76,26 @@ class VBoard_m():
         #occ2 = self.sq_dict[tuple(c2)].occupant
         i1,j1 = c1
         i2,j2 = c2
+        
         if i1 == i2:
-            row = self.rsq_dict[i1].copy() #make new copy of row
-            row[j2] = occ1
-            row[j1] = None
-            self.rsq_dict[i1] = row
+            for i in range(8):
+                if i==i1:
+                    row = self.rsq_dict[i].copy()
+                    row[j2] = occ1
+                    row[j1] = None
+                else:
+                    row = self.rsq_dict[i] # no copy necessary
+                self.rsq_dict[i] = row
         else:
             row1 = self.rsq_dict[i1].copy()
             row2 = self.rsq_dict[i2].copy()
-            row2[j2] = occ1
+            row2[j2] = row1[j1]
             row1[j1] = None
             self.rsq_dict[i1] = row1
             self.rsq_dict[i2] = row2
+            for i in range(8):
+                if i not in [i1,i2]:
+                    self.rsq_dict[i] = self.rsq_dict[i]
         return self
     def __str__(self):
         out = ''
