@@ -109,9 +109,16 @@ class VBoard_m():
             out +=s + '\n'
         return out
             
-    
-    
-    
+def gen_standard_board():
+    from game_setup import index_to_piece
+    sqd = {}
+    for i in range(8):
+        row = []
+        for j in range(8):
+            row.append(index_to_piece((i,j)))
+        sqd[i] = row
+    vbm = VBoard_m(None,rsd)  
+    return vbm  
 if __name__ == '__main__':
 
     pass

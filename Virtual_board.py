@@ -10,7 +10,7 @@ import sys
 
 import numpy as np
 #from moves import moves
-from game_setup import piece_to_fname, standard_game
+from game_setup import piece_to_fname
 
 class VBoard():
     def __init__(self, board_sq_dict):
@@ -75,7 +75,15 @@ class VBoard():
             out +=s + '\n'
         return out
             
-    
+def gen_standard_board():
+    from game_setup import index_to_piece
+    sq_dict = {}
+    for i in range(8):
+        for j in range(8):
+            sq = VSquare(index=(i,j),occupant=index_to_piece((i,j)))
+            sq_dict[(i,j)] = sq
+    vbm = VBoard(sq_dict)  
+    return vbm   
     
     
 if __name__ == '__main__':

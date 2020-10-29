@@ -20,7 +20,7 @@ print(process.memory_info().vms*10**-6)  # in bytes
 def board_score(board, color):
     enemy_color = {'b':'w','w':'b'}[color]
     sign = {color:1, enemy_color:-1}
-    value = {'p':1,'b':3,'n':3,'r':5,'q':9,'k':inf}
+    value = {'p':1,'b':3,'n':3,'r':5,'q':9,'k':100}
     score = 0
     '''
     if in_checkmate(board, color):
@@ -65,30 +65,6 @@ def two_step(board, color):
                 best_move = (c1,c2)
                 lower_limit = wcs
     return best_move
-
-def two_step_random(board, color):
-    enemy_color = {'b':'w','w':'b'}[color]
-    #one_step_boards = board.get_next_boards(color = color)
-    lower_limit = -inf
-    best_move = None
-    best_moves = []
-    for c1, c2, board1 in board.get_next_boards(color):
-        wcs = inf # if the worst is worse than the lower limit, don't go
-        scores_list = []
-        for c3, c4,board2 in board1.get_next_boards(enemy_color):
-            score_2 = board_score(board2, color)
-            scores_list.append(score_2)
-            if score_2 < wcs:
-                wcs = score_2
-            if wcs < lower_limit:
-                break
-        if wcs == lower_limit:
-            best_moves.append((c1,c2))
-        if wcs > lower_limit:
-            best_move = (c1,c2)
-            best_moves = [best_move]
-            lower_limit = wcs
-    return choice(best_moves)
 '''
 def recursive_manager(board, color):
     global process
@@ -96,10 +72,10 @@ def recursive_manager(board, color):
     t0 = time()
     print('color: ' + color)
     vb_m = VBoard_m(board.sq_dict, None)
-    out = two_step_recursive(vb_m, color, -inf, 2)
+    out = two_step_recursive(vb_m, color, -inf, 1)
     print('time: ', time()-t0)
     print(out)
-    return out[0][0]
+    return choice(out[0])#[0]
 def two_step_recursive(board, color, lower_limit, pairs_left):
     enemy_color = {'b':'w','w':'b'}[color]
     pl = pairs_left-1
@@ -150,12 +126,52 @@ def get_occ_color(board, coords):
     else:
         return occ[0]
 
+def minmax_manager(board,color):
+    t0 = time()
+    vb_m = VBoard_m(board.sq_dict, None)
+    out,score = get_min_or_max(vb_m, color, color, 3, 'max')
+    print(time()-t0)
+    print(score)
+    return out
+
+def get_min_or_max(board, color,move_color, n_left,minmax):
+    nl = n_left - 1
+    if nl == 0:
+        scores = []
+        moves = []
+        for c1,c2,board1 in board.get_next_boards(move_color):
+            scores.append(board_score(board1,color))
+            moves.append((c1,c2))
+        mm_val = eval(minmax+f'({scores})')
+        #print(mm_val)
+        return moves[scores.index(mm_val)], mm_val
+    elif nl >0:
+        scores = []
+        moves = []
+        new_minmax = {'min':'max','max':'min'}[minmax]
+        new_move_color = {'w':'b','b':'w'}[move_color]
+        for c1,c2,board1 in board.get_next_boards(move_color):
+            sc = get_min_or_max(board1, color,new_move_color, nl, new_minmax)[1]
+            scores.append(sc)
+            moves.append((c1,c2))
+        mm_val = eval(minmax+f'({scores})')
+        return moves[scores.index(mm_val)], mm_val
+
 
 if __name__ == '__main__':
-    
+    from Virtual_board import gen_standard_board
+    vb = gen_standard_board()
+    vb.execute_move((6,4),(5,4))
+    vb.execute_move((0,1),(2,2))
+    vb.execute_move((6,3),(4,3))
+    print(vb)
+    #print(minmax_manager(vb,'b'))
+
+
+
+
     root = tk.Tk()
-    #root.protocol("WM_DELETE_WINDOW", quit_window())
-    b1 = Board(root, ai = recursive_manager)
+    b1 = Board(root, ai = minmax_manager)
     root.mainloop()
 
 
