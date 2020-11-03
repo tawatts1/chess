@@ -16,17 +16,16 @@ public class next_move
     //int M = args.size();
     
     char[][][] board = construct_board(args[0]);
-    byte[] mv0 = {6,0};
-    
-    ArrayList<byte[]> mvs = moves_pre_check(board, mv0, 'w');
+    byte[] mv0 = {6,2}; // y-coord, x-coord
+    char clr = board[mv0[0]][mv0[1]][0];
+    ArrayList<byte[]> mvs = moves_pre_check(board, mv0, clr);
     
     print_board(board);
     for (byte[] mv : mvs)
     {
       System.out.println(mv[0] + ", " + mv[1]);
     }
-    //System.out.println(args[0]);
-    //str_to_array("hshs ldld ldld ll");
+    
   }
   
   public static ArrayList<byte[]> moves_pre_check(char[][][] board, byte[] coords, char color)
@@ -36,6 +35,7 @@ public class next_move
     char piece_color = board[coords[0]][coords[1]][0];
     if (piece_color==color)
     {
+      byte ff;
       switch (piece)
       {
         case 'n': 
@@ -48,8 +48,11 @@ public class next_move
             byte[] out0 = add_lists(coords, move);
             if (in_board_space(out0))
             {
-              //byte[][] mv = {coords, out0};
-              out.add(out0);
+              ff = friendly_fire(piece_color, board[out0[0]][out0[1]][0]);
+              if (ff != 1)
+              {
+                out.add(out0);
+              }
             }
           }
           break;
@@ -69,8 +72,14 @@ public class next_move
                 byte[] out0 = add_lists(coords, move);
                 if (in_board_space(out0))
                 {
-                  //byte[][] mv = {coords, out0};
-                  out.add(out0);
+                  ff = friendly_fire(piece_color, board[out0[0]][out0[1]][0]);
+                  if (ff==0){out.add(out0);}
+                  else if (ff==1){break;}
+                  else 
+                  {
+                    out.add(out0);
+                    break;
+                  }
                 }
               }
             }
@@ -91,8 +100,14 @@ public class next_move
                 byte[] out0 = add_lists(coords, move);
                 if (in_board_space(out0))
                 {
-                  //byte[][] mv = {coords, out0};
-                  out.add(out0);
+                  ff = friendly_fire(piece_color, board[out0[0]][out0[1]][0]);
+                  if (ff==0){out.add(out0);}
+                  else if (ff==1){break;}
+                  else 
+                  {
+                    out.add(out0);
+                    break;
+                  }
                 }
               }
             }
@@ -113,8 +128,14 @@ public class next_move
                   byte[] out0 = add_lists(coords, move);
                   if (in_board_space(out0))
                   {
-                    //byte[][] mv = {coords, out0};
-                    out.add(out0);
+                    ff = friendly_fire(piece_color, board[out0[0]][out0[1]][0]);
+                    if (ff==0){out.add(out0);}
+                    else if (ff==1){break;}
+                    else 
+                    {
+                      out.add(out0);
+                      break;
+                    }
                   }
                 }
               }
@@ -135,8 +156,11 @@ public class next_move
               byte[] out0 = add_lists(coords, move);
               if (in_board_space(out0))
               {
-                //byte[][] mv = {coords, out0};
-                out.add(out0);
+                ff = friendly_fire(piece_color, board[out0[0]][out0[1]][0]);
+                if (ff != 1)
+                {
+                  out.add(out0);
+                }
               }
             
             }
@@ -145,8 +169,29 @@ public class next_move
         case 'p':
           byte sgn = get_pawn_sign(piece_color);
           byte[] mv0 = {sgn, 0};
+          byte[][] attacks = {{sgn, 1}, {sgn, -1}};
           byte[] out0 = add_lists(coords, mv0);
-          out.add(out0);
+          if (in_board_space(out0))
+          {
+            ff = friendly_fire(piece_color, board[out0[0]][out0[1]][0]);
+            if (ff == 0)
+            {
+              out.add(out0);
+            }
+          }
+          for (byte[] mva : attacks)
+          {
+            out0 = add_lists(coords, mva);
+            if (in_board_space(out0))
+            {
+              ff = friendly_fire(piece_color, board[out0[0]][out0[1]][0]);
+              if (ff == -1)
+              {
+                out.add(out0);
+              }
+            }
+          }
+          //out.add(out0);
           break;
         
       }// end switch statement
@@ -234,13 +279,15 @@ public class next_move
     else if (color=='w'){out = -1;}
     return out;
   }
-  private static byte friendly_fire(char[][][] board, byte[] target_coord, char color)
+  private static byte friendly_fire(char color0, char color1)
   {
     byte out;
-    char target_color = board[target_coord[0]][target_coord[1]][0];
-    if (target_color == '0'){out = 0;}
-    else if (target_color == color){out = 1;}
-    else {out = 1;}
+    if      (color1 == '0')   
+      {out = 0;}
+    else if (color0 == color1)
+      {out = 1;}
+    else                      
+      {out = -1;}
     return out;
   }
 
