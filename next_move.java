@@ -1,5 +1,5 @@
 import java.util.ArrayList;
-
+import java.util.Random;
 
 /** 
  * "br_00_bb_bq_bk_bb_bn_br=bp_bp_bp_bp_bp_bp_bp_bp=00_00_bn_00_00_00_00_00=00_00_00_00_00_00_00_00=00_00_00_wp_00_00_00_00=00_00_00_00_wp_00_00_00=wp_wp_wp_00_00_wp_wp_wp=wr_wn_wb_wq_wk_wb_wn_wr"
@@ -17,16 +17,23 @@ public class next_move
     
     char[][][] board = construct_board(args[0]);
     //byte[] mv0 = {6,2}; // y-coord, x-coord
-    char clr = 'w';//board[mv0[0]][mv0[1]][0];
+    char clr = 'b';//board[mv0[0]][mv0[1]][0];
     ArrayList<byte[][]> mvs = get_moves(board, clr);
-    
+    Random rand = new Random();
+    int i = rand.nextInt(mvs.size());
+    byte[][] mv0 = mvs.get(i);
+    System.out.println("move: " + mv0[0][0] + ", "  
+                                + mv0[0][1] + ", "
+                                + mv0[1][0] + ", " 
+                                + mv0[1][1]);
+    /**
     print_board(board);
     System.out.println(board_score(board, 'w'));
     for (byte[][] mv : mvs)
     {
       System.out.println(mv[0][0] + ", " + mv[0][1]+ "\t" + mv[1][0] + ", " + mv[1][1]);
     }
-
+    **/
   }
   private static ArrayList<byte[][]> get_moves(char[][][] board, char color)
   {
