@@ -16,26 +16,50 @@ public class next_move
     //int M = args.size();
     
     char[][][] board = construct_board(args[0]);
-    byte[] mv0 = {6,2}; // y-coord, x-coord
-    char clr = board[mv0[0]][mv0[1]][0];
-    ArrayList<byte[]> mvs = moves_pre_check(board, mv0, clr);
+    //byte[] mv0 = {6,2}; // y-coord, x-coord
+    char clr = 'w';//board[mv0[0]][mv0[1]][0];
+    ArrayList<byte[][]> mvs = get_moves(board, clr);
     
     print_board(board);
-    for (byte[] mv : mvs)
+    System.out.println(board_score(board, 'w'));
+    for (byte[][] mv : mvs)
     {
-      System.out.println(mv[0] + ", " + mv[1]);
+      System.out.println(mv[0][0] + ", " + mv[0][1]+ "\t" + mv[1][0] + ", " + mv[1][1]);
     }
-    
+
   }
-  
-  public static ArrayList<byte[]> moves_pre_check(char[][][] board, byte[] coords, char color)
+  private static ArrayList<byte[][]> get_moves(char[][][] board, char color)
+  {
+    ArrayList<byte[][]> out = new ArrayList<byte[][]>();
+    //byte[][] mv = new byte[2][2];
+    for (byte i=0; i<8; i++)
+    {
+      for (byte j=0; j<8; j++)
+      {
+        if (board[i][j][0] == color)
+        {
+          byte[] c1 = {i,j};
+          for (byte[] c2 : moves(board, c1, color))
+          {
+            byte[][] mv = {c1,c2};
+            out.add(mv);
+          }
+          
+        }
+      }
+    }
+    return out;
+  }
+  private static ArrayList<byte[]> moves(char[][][] board, byte[] coords, char color)
+  {return moves_pre_check(board, coords, color);}
+  private static ArrayList<byte[]> moves_pre_check(char[][][] board, byte[] coords, char color)
   {
     ArrayList<byte[]> out = new ArrayList<byte[]>();
     char piece = board[coords[0]][coords[1]][1];
     char piece_color = board[coords[0]][coords[1]][0];
     if (piece_color==color)
     {
-      byte ff;
+      byte ff; // friendly fire
       switch (piece)
       {
         case 'n': 
@@ -200,7 +224,43 @@ public class next_move
     return out;
   }
 
+  
 
+  private static byte board_score(char[][][] board, char color)
+  {
+    byte out = 0;
+    byte val = 0;
+    char pp;
+    for (byte i=0; i<8; i++)
+    {
+      for (byte j=0; j<8; j++)
+      {
+        pp = board[i][j][1];
+        if (pp!='0')
+        {
+          val = piece_value(pp);
+          if (color==board[i][j][0]){out+=val;}
+          else {out-=val;}
+        }
+      }
+    }
+    return out;
+  }
+  private static byte piece_value(char piece)
+  {
+    byte out=0;
+    switch (piece)
+    {
+      case 'p' : out=1; break;
+      case 'b' : 
+      case 'n' : out = 3; break;
+      case 'r' : out = 5; break;
+      case 'q' : out = 9; break;
+      case 'k' : out =27; break;
+      default :  out = 0; break;
+    }
+    return out;
+  }
 
 
 
