@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class next_move
 {
-  public static void main (String[] args)
+  public static void main(String[] args)
   {
     //int M = args.size();
     
@@ -22,10 +22,10 @@ public class next_move
     Random rand = new Random();
     int i = rand.nextInt(mvs.size());
     byte[][] mv0 = mvs.get(i);
-    System.out.println("move: " + mv0[0][0] + ", "  
-                                + mv0[0][1] + ", "
-                                + mv0[1][0] + ", " 
-                                + mv0[1][1]);
+    System.out.print(mv0[0][0] + ","  
+                    + mv0[0][1] + ","
+                    + mv0[1][0] + "," 
+                    + mv0[1][1]);
     /**
     print_board(board);
     System.out.println(board_score(board, 'w'));
@@ -35,8 +35,51 @@ public class next_move
     }
     **/
   }
-  private static ArrayList<byte[][]> get_moves(char[][][] board, char color)
+  private static ArrayList<char[][][]> get_next_boards(char[][][] board1, char color)
   {
+    ArrayList<char[][][]> out = new ArrayList<char[][][]>(); 
+    ArrayList<byte[][]> mvs = get_moves(board1, color);
+    for (byte[][] mv : mvs)
+    {
+      char[][][] board2 = execute_move(board1, mv[0], mv[1]);
+      out.add(board2);
+    }
+    return out;
+  }
+  private static char[][][] execute_move(char[][][] board, byte[] c1, byte[] c2)
+  {
+    char[][][] board1 = new char[8][8][2];
+    for (byte i=0; i<8; i++)
+    {
+      if (c1[0] == i || c1[0] == i)
+      {
+        for (byte j=0; j<8; j++)
+        {
+          if ((c1[0] == i && c1[1] == j) || (c2[0] == i && c2[1] == j))// if it's a hit
+          {
+            board1[i][j] = board[i][j].clone();
+          }
+          else
+          {
+            board1[i][j] = board[i][j]; // no clone
+          }
+        }
+        //board1[i] = board[i].clone();
+      }
+      else
+      {
+        board1[i] = board[i]; // no clone
+      }
+      
+    }
+    char[] empty = {'0','0'};
+    char[] piece = board[c1[0]][c1[1]];
+    board1[c2[0]][c2[1]] = piece;
+    board1[c1[0]][c1[1]] = empty;
+    return board1;
+  }
+  private static ArrayList<byte[][]> get_moves(char[][][] board, char color)
+  { // returns all moves for a certain color
     ArrayList<byte[][]> out = new ArrayList<byte[][]>();
     //byte[][] mv = new byte[2][2];
     for (byte i=0; i<8; i++)
