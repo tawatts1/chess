@@ -13,29 +13,18 @@ public class next_move
 {
   public static void main(String[] args)
   {
-    //int M = args.size();
     
     char[][][] board = construct_board(args[0]);
-    //byte[] mv0 = {6,2}; // y-coord, x-coord
-    char clr = 'b';//board[mv0[0]][mv0[1]][0];
-    ArrayList<byte[][]> mvs = get_moves(board, clr);
-    //Random rand = new Random();
-    //int i = rand.nextInt(mvs.size());
-    //System.out.println(board_score(board, clr));
-    byte[][] mv0 = aggressive_ai(board, clr);//mvs.get(i);
-    //System.out.println(board_score(board, clr));
+    
+    char clr = 'b';
+    
+    byte[][] mv0 = aggressive_ai(board, clr);
+    
     System.out.print(mv0[0][0] + ","  
                     + mv0[0][1] + ","
                     + mv0[1][0] + "," 
                     + mv0[1][1]);
-    /**
-    print_board(board);
-    System.out.println(board_score(board, 'w'));
-    for (byte[][] mv : mvs)
-    {
-      System.out.println(mv[0][0] + ", " + mv[0][1]+ "\t" + mv[1][0] + ", " + mv[1][1]);
-    }
-    **/
+    
   }
 
   private static byte[][] aggressive_ai(char[][][] board1, char color)
@@ -85,7 +74,7 @@ public class next_move
     char[][][] board1 = new char[8][8][2];
     for (byte i=0; i<8; i++)
     {
-      if (c1[0] == i || c1[0] == i)
+      if (c1[0] == i || c2[0] == i)
       {
         for (byte j=0; j<8; j++)
         {
@@ -95,19 +84,19 @@ public class next_move
           }
           else
           {
-            board1[i][j] = board[i][j].clone(); // no clone
+            board1[i][j] = board[i][j]; // no clone
           }
         }
         //board1[i] = board[i].clone();
       }
       else
       {
-        board1[i] = board[i].clone(); // no clone
+        board1[i] = board[i];//.clone();//.clone(); // no clone
       }
       
     }
     char[] empty = {'0','0'};
-    char[] piece = board[c1[0]][c1[1]];
+    char[] piece = board1[c1[0]][c1[1]];
     board1[c2[0]][c2[1]] = piece;
     board1[c1[0]][c1[1]] = empty;
     return board1;
