@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class next_move
 {
-  private static final char[] EMPTY = {'0','0'};
+  //private static final char[] EMPTY = {'0','0'};
   public static void main(String[] args)
   {
     
@@ -19,7 +19,7 @@ public class next_move
     
     char clr = 'b';
     byte N   = 1;
-    
+    //print_board(board);
     byte[][] mv0 = recursive_ai(board, clr, N);//aggressive_ai(board, clr);
     
     System.out.print(mv0[0][0] + ","  
@@ -32,11 +32,12 @@ public class next_move
   private static byte[][] recursive_ai(char[][][] board1, char color, byte N)
   {
     ArrayList<byte[][]> mvs = get_moves(board1, color);
-    //char[][][] board2 = new char[8][8][2];
     byte[] scores = new byte[mvs.size()];
+
     char new_move_color;
     if (color=='w'){ new_move_color = 'b'; }
     else { new_move_color = 'w'; }
+
     for (int i=0; i<mvs.size(); i++)
     {
       byte[][] move = mvs.get(i);
@@ -45,7 +46,6 @@ public class next_move
         new_move_color, N);
       //board_score(execute_move(board1,move[0], move[1]), color);
     }
-    
     return mvs.get(max_index(scores));
   }
   private static byte get_min_or_max(
@@ -74,15 +74,20 @@ public class next_move
       else
       {
         ArrayList<byte[][]> mvs = get_moves(board1, move_color);
+        char new_move_color;
+        if (move_color=='w'){ new_move_color = 'b'; }
+        else { new_move_color = 'w'; }
         byte[] scores = new byte[mvs.size()];
         for (int i=0; i<mvs.size(); i++)
         {
           byte[][] move = mvs.get(i);
           scores[i] = board_score(execute_move(board1,move[0], move[1]), move_color);
+          //System.out.println(scores[i]);
         }
+        //System.out.println(scores[max_index(scores)]);
         out = scores[max_index(scores)];
       }
-      return out;
+      return (byte) (-out);
     }
   private static byte[][] aggressive_ai(char[][][] board1, char color)
   {
@@ -152,10 +157,10 @@ public class next_move
       }
       
     }
-    //char[] empty = {'0','0'};
+    char[] empty = {'0','0'};
     char[] piece = board1[c1[0]][c1[1]];
     board1[c2[0]][c2[1]] = piece;
-    board1[c1[0]][c1[1]] = EMPTY;
+    board1[c1[0]][c1[1]] = empty;//EMPTY;
     return board1;
   }
   private static ArrayList<byte[][]> get_moves(char[][][] board, char color)
