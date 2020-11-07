@@ -18,8 +18,9 @@ public class next_move
     char[][][] board = construct_board(args[0]);
     
     char clr = 'b';
+    byte N   = 1;
     
-    byte[][] mv0 = aggressive_ai(board, clr);
+    byte[][] mv0 = recursive_ai(board, clr, N);//aggressive_ai(board, clr);
     
     System.out.print(mv0[0][0] + ","  
                     + mv0[0][1] + ","
@@ -28,12 +29,67 @@ public class next_move
     
   }
 
+  private static byte[][] recursive_ai(char[][][] board1, char color, byte N)
+  {
+    ArrayList<byte[][]> mvs = get_moves(board1, color);
+    //char[][][] board2 = new char[8][8][2];
+    byte[] scores = new byte[mvs.size()];
+    char new_move_color;
+    if (color=='w'){ new_move_color = 'b'; }
+    else { new_move_color = 'w'; }
+    for (int i=0; i<mvs.size(); i++)
+    {
+      byte[][] move = mvs.get(i);
+      scores[i] = get_min_or_max(
+        execute_move(board1, move[0], move[1]), 
+        new_move_color, N);
+      //board_score(execute_move(board1,move[0], move[1]), color);
+    }
+    
+    return mvs.get(max_index(scores));
+  }
+  private static byte get_min_or_max(
+          char[][][] board1, 
+          char move_color,
+          byte n_left)
+    {
+      byte out=0;
+      if (n_left > 1)
+      {
+        System.out.println("lalalalala, 1, 1");
+        ArrayList<byte[][]> mvs = get_moves(board1, move_color);
+        byte[] scores = new byte[mvs.size()];
+        char new_move_color;
+        if (move_color=='w'){ new_move_color = 'b'; }
+        else { new_move_color = 'w'; }
+        for (int i=0; i<mvs.size(); i++)
+        {
+          byte[][] move = mvs.get(i);
+          scores[i] = get_min_or_max(
+            execute_move(board1, move[0], move[1]), new_move_color, (byte) (n_left-1));
+          //board_score(execute_move(board1,move[0], move[1]), move_color);
+        }
+        out = scores[max_index(scores)];
+      }
+      else
+      {
+        ArrayList<byte[][]> mvs = get_moves(board1, move_color);
+        byte[] scores = new byte[mvs.size()];
+        for (int i=0; i<mvs.size(); i++)
+        {
+          byte[][] move = mvs.get(i);
+          scores[i] = board_score(execute_move(board1,move[0], move[1]), move_color);
+        }
+        out = scores[max_index(scores)];
+      }
+      return out;
+    }
   private static byte[][] aggressive_ai(char[][][] board1, char color)
   {
     //ArrayList<char[][][]> boards = get_next_boards(board1, color);
     
     ArrayList<byte[][]> mvs = get_moves(board1, color);
-    char[][][] board2 = new char[8][8][2];
+    //char[][][] board2 = new char[8][8][2];
     byte[] scores = new byte[mvs.size()];
     for (int i=0; i<mvs.size(); i++)
     {
