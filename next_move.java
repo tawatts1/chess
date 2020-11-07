@@ -19,9 +19,11 @@ public class next_move
     //byte[] mv0 = {6,2}; // y-coord, x-coord
     char clr = 'b';//board[mv0[0]][mv0[1]][0];
     ArrayList<byte[][]> mvs = get_moves(board, clr);
-    Random rand = new Random();
-    int i = rand.nextInt(mvs.size());
-    byte[][] mv0 = mvs.get(i);
+    //Random rand = new Random();
+    //int i = rand.nextInt(mvs.size());
+    //System.out.println(board_score(board, clr));
+    byte[][] mv0 = aggressive_ai(board, clr);//mvs.get(i);
+    //System.out.println(board_score(board, clr));
     System.out.print(mv0[0][0] + ","  
                     + mv0[0][1] + ","
                     + mv0[1][0] + "," 
@@ -35,6 +37,37 @@ public class next_move
     }
     **/
   }
+
+  private static byte[][] aggressive_ai(char[][][] board1, char color)
+  {
+    //ArrayList<char[][][]> boards = get_next_boards(board1, color);
+    
+    ArrayList<byte[][]> mvs = get_moves(board1, color);
+    char[][][] board2 = new char[8][8][2];
+    byte[] scores = new byte[mvs.size()];
+    for (int i=0; i<mvs.size(); i++)
+    {
+      byte[][] move = mvs.get(i);
+      scores[i] = board_score(execute_move(board1,move[0], move[1]), color);
+    }
+    
+    return mvs.get(max_index(scores));
+  }
+  private static int max_index(byte[] arr)
+  {
+    //byte out = 0;
+    int max_i = 0;
+    for (int i=0; i<arr.length; i++)
+    {
+      if (arr[i] > arr[max_i])
+      {
+        max_i = i;
+      }
+    }
+    //System.out.println(arr[max_i]);
+    return max_i;
+  }
+/**
   private static ArrayList<char[][][]> get_next_boards(char[][][] board1, char color)
   {
     ArrayList<char[][][]> out = new ArrayList<char[][][]>(); 
@@ -46,6 +79,7 @@ public class next_move
     }
     return out;
   }
+  **/
   private static char[][][] execute_move(char[][][] board, byte[] c1, byte[] c2)
   {
     char[][][] board1 = new char[8][8][2];
@@ -61,14 +95,14 @@ public class next_move
           }
           else
           {
-            board1[i][j] = board[i][j]; // no clone
+            board1[i][j] = board[i][j].clone(); // no clone
           }
         }
         //board1[i] = board[i].clone();
       }
       else
       {
-        board1[i] = board[i]; // no clone
+        board1[i] = board[i].clone(); // no clone
       }
       
     }
