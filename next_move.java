@@ -1,82 +1,93 @@
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-/** 
- * "br_00_bb_bq_bk_bb_bn_br=bp_bp_bp_bp_bp_bp_bp_bp=00_00_bn_00_00_00_00_00=00_00_00_00_00_00_00_00=00_00_00_wp_00_00_00_00=00_00_00_00_wp_00_00_00=wp_wp_wp_00_00_wp_wp_wp=wr_wn_wb_wq_wk_wb_wn_wr"
- * "br_00_bb_bq_bk_bb_bn_br=00_00_00_00_00_00_00_00=00_00_bn_00_00_00_00_00=00_00_00_00_00_00_00_00=00_00_00_wp_00_00_00_00=00_00_00_00_wp_00_00_00=wp_wp_wp_00_00_wp_wp_wp=wr_wn_wb_wq_wk_wb_wn_wr"
+import java.util.concurrent.Future;
 
- * 
- * 
- * **/
 
-public class next_move
-{
+public class next_move {
 
-  public static class thread_scores implements Runnable
-  {
-    Object target;
+  public static class thread_score implements Callable<Byte> {
+    char[][][] board0;
+    char color;
+    byte N;
 
-    public thread_scores(Object target)
-    {
-      this.target = target;
+    public thread_score(char[][][] board0, char color, byte N) {
+      this.board0 = board0;
+      this.color = color;
+      this.N = N;
     }
 
-    @Override;
-
+    //@Override // not needed?
+    public Byte call() throws Exception {
+      return get_min_or_max(board0, color, N);
+    }
   }
 
-  private static final char[] EMPTY = {'0','0'};
-  private static final char[] BP    = {'b','p'};
-  private static final char[] WP    = {'w','p'};
-  private static final char[] BQ    = {'b','q'};
-  private static final char[] WQ    = {'w','q'};
-  private static final char[] BK    = {'b','k'};
-  private static final char[] WK    = {'w','k'};
-  private static final char[] BB    = {'b','b'};
-  private static final char[] WB    = {'w','b'};
-  private static final char[] BN    = {'b','n'};
-  private static final char[] WN    = {'w','n'};
-  private static final char[] BR    = {'b','r'};
-  private static final char[] WR    = {'w','r'};
-  public static void main(String[] args)
-  {
-    
+  private static final char[] EMPTY = { '0', '0' };
+  private static final char[] BP = { 'b', 'p' };
+  private static final char[] WP = { 'w', 'p' };
+  private static final char[] BQ = { 'b', 'q' };
+  private static final char[] WQ = { 'w', 'q' };
+  private static final char[] BK = { 'b', 'k' };
+  private static final char[] WK = { 'w', 'k' };
+  private static final char[] BB = { 'b', 'b' };
+  private static final char[] WB = { 'w', 'b' };
+  private static final char[] BN = { 'b', 'n' };
+  private static final char[] WN = { 'w', 'n' };
+  private static final char[] BR = { 'b', 'r' };
+  private static final char[] WR = { 'w', 'r' };
+
+  public static void main(String[] args) {
+
     char[][][] board = construct_board(args[0]);
-    
+
     char clr = 'b';
-    byte N   = 4 ;
-    //print_board(board);
-    //List<Future<String>> futures = executorService.invokeAll(callableTasks);
+    byte N = 3;
+    
 
     Random rando = new Random();
-    ArrayList<byte[][]> mvs = recursive_ai(board, clr, N);//aggressive_ai(board, clr);
+    ArrayList<byte[][]> mvs = recursive_ai(board, clr, N);// aggressive_ai(board, clr);
     int rand_i = rando.nextInt(mvs.size());
     byte[][] mv0 = mvs.get(rand_i);
-    System.out.print(mv0[0][0] + ","  
-                    + mv0[0][1] + ","
-                    + mv0[1][0] + "," 
-                    + mv0[1][1]);
-    
+    System.out.print(mv0[0][0] + "," + mv0[0][1] + "," + mv0[1][0] + "," + mv0[1][1]);
+
   }
 
-  private static ArrayList<byte[][]> recursive_ai(char[][][] board1, char color, byte N)
-  {
+  private static ArrayList<byte[][]> recursive_ai(char[][][] board1, char color, byte N) {
+    //
     ArrayList<byte[][]> mvs = get_moves(board1, color);
     byte[] scores = new byte[mvs.size()];
 
-    char new_move_color;
-    if (color=='w'){ new_move_color = 'b'; }
-    else { new_move_color = 'w'; }
+    ExecutorService executor = (ExecutorService) Executors.newFixedThreadPool(3);// !!!
+    List<Callable<Byte>> callableTasks = new ArrayList<>();
 
-    for (int i=0; i<mvs.size(); i++)
-    {
+    char new_move_color;
+    if (color == 'w') {
+      new_move_color = 'b';
+    } else {
+      new_move_color = 'w';
+    }
+
+    for (int i = 0; i < mvs.size(); i++) {
+      // add all scoring methods after one move to a collection
       byte[][] move = mvs.get(i);
-      scores[i] = get_min_or_max(
-        execute_move(board1, move[0], move[1]), 
-        new_move_color, N);
-      //board_score(execute_move(board1,move[0], move[1]), color);
+      char[][][] board2 = execute_move(board1, move[0], move[1]);
+      callableTasks.add(new thread_score(board2, new_move_color, N));
+    }
+    List<Future<Byte>> result = null;
+    try {
+      result = executor.invokeAll(callableTasks);
+      executor.shutdown();
+      for (int i=0; i<scores.length; i++) 
+      {
+        scores[i] = result.get(i).get();
+      }
+    } catch (InterruptedException | ExecutionException e) {
+      e.printStackTrace();
     }
     byte max_score = scores[max_index(scores)];
     ArrayList<byte[][]> out = new ArrayList<byte[][]>();
@@ -100,9 +111,6 @@ public class next_move
       {
         if (n_left > 1)
         {
-          //System.out.println("lalalalala, 1, 1");
-          
-          
             byte[] scores = new byte[mvs.size()];
             char new_move_color;
             if (move_color=='w'){ new_move_color = 'b'; }
@@ -112,7 +120,6 @@ public class next_move
               byte[][] move = mvs.get(i);
               scores[i] = get_min_or_max(
                 execute_move(board1, move[0], move[1]), new_move_color, (byte) (n_left-1));
-              //board_score(execute_move(board1,move[0], move[1]), move_color);
             }
             out = scores[max_index(scores)];
           
@@ -124,9 +131,8 @@ public class next_move
           {
             byte[][] move = mvs.get(i);
             scores[i] = board_score(execute_move(board1,move[0], move[1]), move_color);
-            //System.out.println(scores[i]);
           }
-          //System.out.println(scores[max_index(scores)]);
+          
           out = scores[max_index(scores)];
         }
       }
@@ -135,8 +141,7 @@ public class next_move
     }
   private static byte[][] aggressive_ai(char[][][] board1, char color)
   {
-    //ArrayList<char[][][]> boards = get_next_boards(board1, color);
-    
+   
     ArrayList<byte[][]> mvs = get_moves(board1, color);
     //char[][][] board2 = new char[8][8][2];
     byte[] scores = new byte[mvs.size()];
@@ -201,10 +206,9 @@ public class next_move
       }
       
     }
-    //char[] empty = {'0','0'};
     char[] piece = board1[c1[0]][c1[1]];
     board1[c2[0]][c2[1]] = piece;
-    board1[c1[0]][c1[1]] = EMPTY; // empty;//
+    board1[c1[0]][c1[1]] = EMPTY; 
     return board1;
   }
   private static ArrayList<byte[][]> get_moves(char[][][] board, char color)
@@ -445,16 +449,6 @@ public class next_move
     return out;
   }
 
-
-
-
-
-
-
-
-
-
-
   private static boolean in_board_space(byte[] out0)
   {
     if (out0[0]<8 && out0[0]>-1 && out0[1] < 8 && out0[1] >-1){return true;}
@@ -505,13 +499,7 @@ public class next_move
             case 'r': row_l[j] = WR; break; 
           }
         }
-        /**
-        for (byte k=0; k<2; k++)
-        {
-          row_l[j][k] = pieces[j].charAt(k);
-        }
-        **/
-        //System.out.print(piece+"\n");
+        
       }
       out[i] = row_l;
     }
