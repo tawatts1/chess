@@ -347,7 +347,7 @@ private static byte get_min_or_max_enhanced(
     //byte[][] mv = new byte[2][2];
     byte[] c1 = new byte[2];
     byte[] c2 = new byte[2];
-    byte[][] mv = new byte[2][2];
+    //byte[][] mv = new byte[2][2];
     ArrayList<byte[]> piece_moves = new ArrayList<byte[]>();
     
     for (byte i=0; i<8; i++)

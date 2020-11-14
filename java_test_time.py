@@ -10,6 +10,7 @@ string3 = "br_bn_bb_00_bk_bb_00_br=00_bp_00_bp_bp_bp_bp_bp=bp_00_bp_00_00_00_00_
 string4 = "00_br_bb_00_bk_bb_bn_br=bp_00_bp_bp_00_bp_bp_bp=00_bp_00_00_bp_00_00_00=bn_00_00_00_00_00_bq_00=00_00_00_wp_wp_00_00_00=00_wp_wp_wb_00_00_wp_00=wp_00_00_00_00_wp_00_wp=wr_wn_wb_wq_wk_00_wn_wr"
 file = 'next_move'
 '''
+in the case that byte N = 5;
 string1: 
 0,0,1,0
 0,1,2,2
