@@ -49,10 +49,13 @@ public class next_move {
 
     char clr = 'b';
     byte N = 4;
-    
-    boolean check = true;
+    boolean check = false;
+    if (args.length > 1 && args[1].equals("true"))
+    {
+      check = true;
+    }
 
-    Random rando = new Random();
+    
     ArrayList<byte[][]> mvs = recursive_ai_enhanced(board, clr, N);// aggressive_ai(board, clr);
     
     if (check)
@@ -64,6 +67,7 @@ public class next_move {
     }
     else
     {
+      Random rando = new Random();
       int rand_i = rando.nextInt(mvs.size());
       byte[][] mv0 = mvs.get(rand_i);
       System.out.print(mv0[0][0] + "," + mv0[0][1] + "," + mv0[1][0] + "," + mv0[1][1]);
@@ -80,12 +84,16 @@ private static ArrayList<byte[][]> recursive_ai_enhanced(char[][][] board1, char
   if (color=='w'){ new_move_color = 'b'; }
   else { new_move_color = 'w'; }
   byte wcs = -127; // start as the worst possible
+  byte current_board_score = board_score(board1, color);
+  byte negative_next_board_score;
   for (int i=0; i<mvs.size(); i++)
   {
     byte[][] move = mvs.get(i);
+    negative_next_board_score = (byte) (-current_board_score + 
+                              piece_value(board1[move[1][0]][move[1][1]][1]));
     scores[i] = get_min_or_max_enhanced(
       execute_move(board1, move[0], move[1]), 
-      new_move_color, N, wcs);
+      new_move_color, N, wcs, negative_next_board_score);
     if (scores[i] > wcs)
     {
       wcs = scores[i];
@@ -107,7 +115,8 @@ private static byte get_min_or_max_enhanced(
         char[][][] board1, 
         char move_color,
         byte n_left,
-        byte wcs)
+        byte wcs,
+        byte current_board_score)
   /** The idea is as follows: suppose white is thinking ahead and comes up with a
    * move in which he can force a gain of 5 points. He is now considering his next
    * possible move but discovers that if he does that black can then force that white
@@ -123,28 +132,30 @@ private static byte get_min_or_max_enhanced(
     {
       if (n_left > 1)
       {
-          
-          byte[] scores = new byte[mvs.size()];
-          char new_move_color;
-          if (move_color=='w'){ new_move_color = 'b'; }
-          else { new_move_color = 'w'; }
-          for (int i=0; i<mvs.size(); i++)
-          {
-            byte[][] move = mvs.get(i);
-            scores[i] = get_min_or_max_enhanced(
-              execute_move(board1, move[0], move[1]), 
-              new_move_color, (byte) (n_left-1), new_wcs);
-            if (new_wcs < scores[i]) // if there's a better path,
-            {// there is a new worst case scenario
-              new_wcs = scores[i];
-            }
-            if (scores[i] > -wcs)
-            {
-              break;
-            }
-            //board_score(execute_move(board1,move[0], move[1]), move_color);
+        byte negative_next_board_score;
+        byte[] scores = new byte[mvs.size()];
+        char new_move_color;
+        if (move_color=='w'){ new_move_color = 'b'; }
+        else { new_move_color = 'w'; }
+        for (int i=0; i<mvs.size(); i++)
+        {
+          byte[][] move = mvs.get(i);
+          negative_next_board_score = (byte) (-current_board_score + 
+                      piece_value(board1[move[1][0]][move[1][1]][1]));
+          scores[i] = get_min_or_max_enhanced(
+            execute_move(board1, move[0], move[1]), 
+            new_move_color, (byte) (n_left-1), new_wcs, negative_next_board_score);
+          if (new_wcs < scores[i]) // if there's a better path,
+          {// there is a new worst case scenario
+            new_wcs = scores[i];
           }
-          out = scores[max_index(scores)];
+          if (scores[i] > -wcs)
+          {
+            break;
+          }
+          //board_score(execute_move(board1,move[0], move[1]), move_color);
+        }
+        out = scores[max_index(scores)];
         
       }
       else
@@ -153,7 +164,8 @@ private static byte get_min_or_max_enhanced(
         for (int i=0; i<mvs.size(); i++)
         {
           byte[][] move = mvs.get(i);
-          scores[i] = board_score(execute_move(board1,move[0], move[1]), move_color);
+          scores[i] = (byte) (-current_board_score + piece_value(board1[move[1][0]][move[1][1]][1]));
+          //board_score(execute_move(board1,move[0], move[1]), move_color);
           //System.out.println(scores[i]);
           if (scores[i] > -wcs)
             {
