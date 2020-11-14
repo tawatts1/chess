@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -47,7 +48,7 @@ public class next_move {
     char[][][] board = construct_board(args[0]);
 
     char clr = 'b';
-    byte N = 5;
+    byte N = 4;
     
     boolean check = true;
 
@@ -330,22 +331,38 @@ private static byte get_min_or_max_enhanced(
   { // returns all moves for a certain color
     ArrayList<byte[][]> out = new ArrayList<byte[][]>();
     //byte[][] mv = new byte[2][2];
+    byte[] c1 = new byte[2];
+    byte[] c2 = new byte[2];
+    byte[][] mv = new byte[2][2];
+    ArrayList<byte[]> piece_moves = new ArrayList<byte[]>();
+    
     for (byte i=0; i<8; i++)
     {
       for (byte j=0; j<8; j++)
       {
         if (board[i][j][0] == color)
         {
-          byte[] c1 = {i,j};
-          for (byte[] c2 : moves(board, c1, color))
+          c1[0] = i; c1[1] = j;
+          piece_moves = moves(board, c1, color);
+          for (int k=0; k<piece_moves.size(); k++)//(byte[] c2 : moves(board, c1, color))
           {
-            byte[][] mv = {c1,c2};
-            out.add(mv);
+            c2 = piece_moves.get(k);
+            //mv[0][0] = c1[0]; mv[0][1] = c1[1];
+            //mv[1][0] = c2[0]; mv[1][1] = c2[1];
+            //mv = Arrays.copyOf(mv, 4);
+            out.add(make_copy(c1,c2));
           }
           
         }
       }
     }
+    return out;
+  }
+  private static byte[][] make_copy(byte[] c1, byte[] c2)
+  {
+    byte[][] out = new byte[2][2];
+    out[0][0] = c1[0]; out[0][1] = c1[1];
+    out[1][0] = c2[0]; out[1][1] = c2[1];
     return out;
   }
   private static ArrayList<byte[]> moves(char[][][] board, byte[] coords, char color)
