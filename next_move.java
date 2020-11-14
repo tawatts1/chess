@@ -303,6 +303,7 @@ private static byte get_min_or_max_enhanced(
     {
       if (c1[0] == i || c2[0] == i)
       {
+      
         for (byte j=0; j<8; j++)
         {
           if ((c1[0] == i && c1[1] == j) || (c2[0] == i && c2[1] == j))// if it's a hit
@@ -314,6 +315,7 @@ private static byte get_min_or_max_enhanced(
             board1[i][j] = board[i][j]; // no clone
           }
         }
+        
         //board1[i] = board[i].clone();
       }
       else
@@ -344,12 +346,10 @@ private static byte get_min_or_max_enhanced(
         {
           c1[0] = i; c1[1] = j;
           piece_moves = moves(board, c1, color);
-          for (int k=0; k<piece_moves.size(); k++)//(byte[] c2 : moves(board, c1, color))
+          for (int k=0; k<piece_moves.size(); k++)
           {
             c2 = piece_moves.get(k);
-            //mv[0][0] = c1[0]; mv[0][1] = c1[1];
-            //mv[1][0] = c2[0]; mv[1][1] = c2[1];
-            //mv = Arrays.copyOf(mv, 4);
+            
             out.add(make_copy(c1,c2));
           }
           
