@@ -57,7 +57,8 @@ public class next_move {
 
     
     ArrayList<byte[][]> mvs = recursive_ai_enhanced(board, clr, N);// aggressive_ai(board, clr);
-    
+    mvs = filter_illegal_moves(board, mvs);
+    if (mvs.size()==0) mvs = filter_illegal_moves(board, get_moves(board, clr));
     if (check)
     {
       for (byte[][] mv0 : mvs)
@@ -74,7 +75,56 @@ public class next_move {
     }
   }
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+/**
+private static void test_illegal_filter()
+{
 
+}
+*/
+private static ArrayList<byte[][]> filter_illegal_moves(char[][][] board1, ArrayList<byte[][]> mvs) 
+{
+  ArrayList<byte[][]> out = new ArrayList<byte[][]>();
+  //get color
+  char color = board1[mvs.get(0)[0][0]][mvs.get(0)[0][1]][0];
+  char other_color;
+  if      (color=='b')  other_color = 'w';
+  else if (color=='w')  other_color = 'b';
+  else return out;
+  //locate king of that color
+  byte[] king_coords = new byte[2];
+  for (byte i=0; i<8; i++)
+  {
+    for (byte j=0; j<8; j++)
+    {
+      if (board1[i][j][0] == color && board1[i][j][1] == 'k')
+      {
+        king_coords[0] = i; king_coords[1] = j;
+        //System.out.println("found king");
+        break;
+      }
+    }
+  }
+  // admit only moves which do not put in check. 
+  char[][][] board2 = new char[8][8][2];
+  boolean illegal;
+  for (byte[][] mv0 : mvs)
+  {
+    illegal = false;
+    board2 = execute_move(board1, mv0[0], mv0[1]);
+    ArrayList<byte[][]> mvs2 = get_moves(board2, other_color);
+    for (byte[][] mv2: mvs2)
+    {
+      if (Arrays.equals(mv2[1], king_coords))//(king_coords[0]==mv2[1][0] && king_coords[1] == mv2[1][1])//(king_coords.equals(mv2[1]))
+      {
+        illegal=true;
+        break;
+        //out.add(mv0);
+      }
+    }
+    if (false==illegal) out.add(mv0);
+  }
+  return out;
+}
 private static ArrayList<byte[][]> recursive_ai_enhanced(char[][][] board1, char color, byte N)
 {
   ArrayList<byte[][]> mvs = get_moves(board1, color);
@@ -91,9 +141,16 @@ private static ArrayList<byte[][]> recursive_ai_enhanced(char[][][] board1, char
     byte[][] move = mvs.get(i);
     negative_next_board_score = (byte) (-current_board_score + 
                               piece_value(board1[move[1][0]][move[1][1]][1]));
-    scores[i] = get_min_or_max_enhanced(
-      execute_move(board1, move[0], move[1]), 
-      new_move_color, N, wcs, negative_next_board_score);
+    if (N>0)
+    {                     
+      scores[i] = get_min_or_max_enhanced(
+        execute_move(board1, move[0], move[1]), 
+        new_move_color, N, wcs, negative_next_board_score);
+    }
+    else
+    {
+      scores[i] = board_score(execute_move(board1, move[0],move[1]), color);
+    }
     if (scores[i] > wcs)
     {
       wcs = scores[i];

@@ -8,6 +8,7 @@ string1 = "br_bn_bb_00_bk_bb_bn_br=00_00_bp_bp_00_bp_bp_bp=bp_bp_00_00_bp_bq_00_
 string2 = "br_00_bb_00_00_00_00_00=bp_bp_00_bp_bk_bp_bp_br=00_00_00_00_bp_bn_00_bp=00_bq_00_wp_00_00_00_00=00_00_wn_00_00_wp_00_00=wp_wn_00_wp_00_00_wp_00=00_00_wp_00_00_00_wb_wp=wr_00_00_wq_wk_00_00_wr"
 string3 = "br_bn_bb_00_bk_bb_00_br=00_bp_00_bp_bp_bp_bp_bp=bp_00_bp_00_00_00_00_bn=00_00_00_00_00_00_bq_00=00_00_00_wp_00_00_00_00=00_00_00_wb_wp_00_wp_00=wp_wp_wp_wb_00_wp_00_wp=wr_wn_00_wq_wk_00_wn_wr"
 string4 = "00_br_bb_00_bk_bb_bn_br=bp_00_bp_bp_00_bp_bp_bp=00_bp_00_00_bp_00_00_00=bn_00_00_00_00_00_bq_00=00_00_00_wp_wp_00_00_00=00_wp_wp_wb_00_00_wp_00=wp_00_00_00_00_wp_00_wp=wr_wn_wb_wq_wk_00_wn_wr"
+string5 = "00_bn_00_bq_bk_bb_00_br=00_bp_bp_00_00_00_00_bp=00_00_00_bp_bp_bp_00_00=bp_00_00_wp_00_00_bp_00=00_00_00_00_00_00_00_00=00_00_wp_00_wq_00_wp_00=wp_wp_00_00_00_00_00_wp=wr_wn_wb_00_wk_00_wn_wr"
 file = 'next_move'
 '''
 in the case that byte N = 5;
@@ -49,7 +50,7 @@ threaten queen directly
 3,6,0,3
 '''
 #print(string)
-for string in [string1, string2, string3, string4]:
+for string in [string5]:#string1, string2, string3, string4]:
     t0 = time.time()
     move =  subprocess.run(
                         ['java',file, string, 'true'],
