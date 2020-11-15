@@ -47,10 +47,10 @@ public class next_move {
 
     char[][][] board = construct_board(args[0]);
 
-    char clr = 'b';
-    byte N = 4;
+    char clr = args[1].charAt(0);
+    byte N = (byte) (Integer.parseInt(args[2]));
     boolean check = false;
-    if (args.length > 1 && args[1].equals("true"))
+    if (args.length > 3 && args[3].equals("true"))
     {
       check = true;
     }

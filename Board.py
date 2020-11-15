@@ -21,16 +21,18 @@ from game_ai import random_move
 class Board(ttk.Frame):
     def __init__(self, parent, piece_func = piece_to_fname,
                  board_color = {0:'grey',1:'brown'}, 
-                 ai = random_move):
+                 ai = random_move, ai2 = None):
         super().__init__(parent)
 
         self.parent = parent
         self.board_color = board_color
         self.ai = ai
+        self.ai2 = ai2
+        self.turn = 'w'
         self.setup_new_game()
         self.grid(row=0, column=0)
         self.old_commands = {}
-        self.turn = 'w'
+        
         
 
     def setup_new_game(self):
@@ -54,27 +56,42 @@ class Board(ttk.Frame):
             sqi = self.sq_dict[tuple(i)]
             
             def cmd(c1, c2):
-                vb = VBoard(self.sq_dict)
-                if not in_checkmate(vb, self.turn):
-                    self.paint_checkerboard()
-                    self.execute_sq_move(c1,c2)
+                if not self.ai2:
                     vb = VBoard(self.sq_dict)
-                    print(vb)
-                    self.change_turn()
                     if not in_checkmate(vb, self.turn):
-                        self.parent.update()
-                        
-                        # have ai do its thing
-                        if self.ai:
-                            c3, c4 = self.ai(vb, color = 'b')
+                        self.paint_checkerboard()
+                        self.execute_sq_move(c1,c2)
+                        vb = VBoard(self.sq_dict)
+                        print(vb)
+                        self.change_turn()
+                        if not in_checkmate(vb, self.turn):
+                            self.parent.update()
                             
-                            self.execute_sq_move(c3,c4)
-                            vb = VBoard(self.sq_dict)
-                            self.change_turn()
-                    self.reset_move_commands(color = self.turn)
-                
-                
-                
+                            # have ai do its thing
+                            if self.ai:
+                                c3, c4 = self.ai(vb, color = 'b')
+                                
+                                self.execute_sq_move(c3,c4)
+                                vb = VBoard(self.sq_dict)
+                                self.change_turn()
+                        else:
+                            print('checkmate')
+                        self.reset_move_commands(color = self.turn)
+                    else:
+                        print('checkmate')
+                else: # if there are two ais:
+                    vb = VBoard(self.sq_dict)
+                    while not in_checkmate(vb, self.turn):
+                        if self.turn=='w':
+                            c3,c4 = self.ai(vb, self.turn)
+                        else: 
+                            c3,c4 = self.ai2(vb, self.turn)
+                        self.execute_sq_move(c3, c4)
+                        self.change_turn()
+                        self.parent.update()
+                        vb = VBoard(self.sq_dict)
+                        sleep(1)
+
             sqi.set_command(partial(cmd, i0, i))
             
     def execute_sq_move(self, c1, c2):
@@ -91,10 +108,12 @@ class Board(ttk.Frame):
         sq1.change_occupant(None)
         print(c1, ' --> ', c2)
     def reset_move_commands(self, color = 'w'):
+    
         for square in self.sq_dict.values():
             cmd0 = partial(self.highlight_squares, square.index,
                             moves(self.sq_dict, tuple(square.index), color))
             square.set_command(cmd0)
+        
 
 
     def paint_checkerboard(self):
@@ -106,8 +125,10 @@ class Board(ttk.Frame):
         self.turn = {'b':'w','w':'b'}[self.turn]
     
 if __name__ == '__main__':
-
+    from pyjava_ai import java_ai
+    ai1 = partial(java_ai, **{'N':3})
+    ai2 = partial(java_ai, **{'N':4})
     root = tk.Tk()
     #root.protocol("WM_DELETE_WINDOW", quit_window())
-    b1 = Board(root)
+    b1 = Board(root, ai = ai1, ai2 = ai2)
     root.mainloop()

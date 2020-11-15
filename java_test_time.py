@@ -50,10 +50,10 @@ threaten queen directly
 3,6,0,3
 '''
 #print(string)
-for string in [string5]:#string1, string2, string3, string4]:
+for string in [string1, string2, string3, string4]:
     t0 = time.time()
     move =  subprocess.run(
-                        ['java',file, string, 'true'],
+                        ['java',file, string,'b','4', 'true'],
                         check=True, 
                         stdout=subprocess.PIPE).stdout.decode('ascii')
     print(move)
