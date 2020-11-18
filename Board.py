@@ -10,6 +10,7 @@ from Virtual_board import VBoard
 import tkinter as tk
 from tkinter import ttk
 #import tkMessageBox
+import time
 from time import sleep
 from functools import partial
 from moves0 import moves, in_checkmate, special_move
@@ -81,16 +82,29 @@ class Board(ttk.Frame):
                         print('checkmate')
                 else: # if there are two ais:
                     vb = VBoard(self.sq_dict)
-                    while not in_checkmate(vb, self.turn):
+                    brk = False
+                    for i in range(150): 
+                        t0 = time.time()
+                        if not self.has_two_kings():
+                            brk=True
                         if self.turn=='w':
                             c3,c4 = self.ai(vb, self.turn)
                         else: 
                             c3,c4 = self.ai2(vb, self.turn)
+                        t1 = time.time()
+                        
                         self.execute_sq_move(c3, c4)
                         self.change_turn()
                         self.parent.update()
                         vb = VBoard(self.sq_dict)
-                        sleep(1)
+                        if brk:
+                            print('king slain')
+                            break
+                        if t1-t0 < 2:
+                            sleep(2-t1+t0)
+                        #sleep(1)
+                    else:
+                        print('stalemate')
 
             sqi.set_command(partial(cmd, i0, i))
             
@@ -113,8 +127,6 @@ class Board(ttk.Frame):
             cmd0 = partial(self.highlight_squares, square.index,
                             moves(self.sq_dict, tuple(square.index), color))
             square.set_command(cmd0)
-        
-
 
     def paint_checkerboard(self):
         for i in range(8):
@@ -123,11 +135,20 @@ class Board(ttk.Frame):
                 self.sq_dict[(i,j)].config(bg = bg_color)
     def change_turn(self):
         self.turn = {'b':'w','w':'b'}[self.turn]
-    
+    def has_two_kings(self):
+        i=0
+        for sq in self.sq_dict.values():
+            if sq.occupant is not None:
+                if sq.occupant[1] == 'k':
+                    i+=1
+        if i==2:
+            return True
+        else:
+            return False
 if __name__ == '__main__':
     from pyjava_ai import java_ai
-    ai1 = partial(java_ai, **{'N':3})
-    ai2 = partial(java_ai, **{'N':4})
+    ai1 = partial(java_ai, **{'N':4, 'special_option': 'kill_king'})
+    ai2 = partial(java_ai, **{'N':4, 'special_option': 'kill_king'})
     root = tk.Tk()
     #root.protocol("WM_DELETE_WINDOW", quit_window())
     b1 = Board(root, ai = ai1, ai2 = ai2)

@@ -46,19 +46,31 @@ public class next_move {
   public static void main(String[] args) {
 
     char[][][] board = construct_board(args[0]);
-
+    //print_board(board);
     char clr = args[1].charAt(0);
     byte N = (byte) (Integer.parseInt(args[2]));
     boolean check = false;
-    if (args.length > 3 && args[3].equals("true"))
+    boolean to_death=false;
+    if (args.length > 3)
     {
-      check = true;
+      if (args[3].equals("list_all"))
+        check=true;
+      else if (args[3].equals("kill_king"))
+        to_death=true;
     }
+    
 
     
     ArrayList<byte[][]> mvs = recursive_ai_enhanced(board, clr, N);// aggressive_ai(board, clr);
-    mvs = filter_illegal_moves(board, mvs);
-    if (mvs.size()==0) mvs = filter_illegal_moves(board, get_moves(board, clr));
+    if (false==to_death)
+      mvs = filter_illegal_moves(board, mvs);
+    
+    if (mvs.size()==0)
+    {
+      mvs = get_moves(board, clr);
+      mvs = filter_illegal_moves(board, get_moves(board, clr));
+    }
+    
     if (check)
     {
       for (byte[][] mv0 : mvs)
@@ -75,53 +87,42 @@ public class next_move {
     }
   }
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-/**
-private static void test_illegal_filter()
-{
 
-}
-*/
-private static ArrayList<byte[][]> filter_illegal_moves(char[][][] board1, ArrayList<byte[][]> mvs) 
+private static ArrayList<byte[][]> filter_illegal_moves(char[][][] board, ArrayList<byte[][]> moves)
 {
   ArrayList<byte[][]> out = new ArrayList<byte[][]>();
-  //get color
-  char color = board1[mvs.get(0)[0][0]][mvs.get(0)[0][1]][0];
+  char color = board[moves.get(0)[0][0]][moves.get(0)[0][1]][0];
+  for (byte[][] mv0 : moves)
+    if (false==in_check(execute_move(board, mv0[0], mv0[1]), color))
+      out.add(mv0);
+  return out;
+}
+private static boolean in_check(char[][][] board, char color)
+{
+  boolean out = false;
   char other_color;
-  if      (color=='b')  other_color = 'w';
-  else if (color=='w')  other_color = 'b';
-  else return out;
-  //locate king of that color
+  if (color=='b') other_color = 'w';
+  else if (color == 'w') other_color = 'b';
+  else return true;
   byte[] king_coords = new byte[2];
   for (byte i=0; i<8; i++)
   {
     for (byte j=0; j<8; j++)
     {
-      if (board1[i][j][0] == color && board1[i][j][1] == 'k')
+      if (board[i][j][0] == color && board[i][j][1] == 'k')
       {
         king_coords[0] = i; king_coords[1] = j;
-        //System.out.println("found king");
-        break;
       }
     }
   }
-  // admit only moves which do not put in check. 
-  char[][][] board2 = new char[8][8][2];
-  boolean illegal;
-  for (byte[][] mv0 : mvs)
+  ArrayList<byte[][]> mvs = get_moves(board, other_color);
+  for (byte[][] mv : mvs)
   {
-    illegal = false;
-    board2 = execute_move(board1, mv0[0], mv0[1]);
-    ArrayList<byte[][]> mvs2 = get_moves(board2, other_color);
-    for (byte[][] mv2: mvs2)
+    if (mv[1][0] == king_coords[0] && mv[1][1] == king_coords[1])
     {
-      if (Arrays.equals(mv2[1], king_coords))//(king_coords[0]==mv2[1][0] && king_coords[1] == mv2[1][1])//(king_coords.equals(mv2[1]))
-      {
-        illegal=true;
-        break;
-        //out.add(mv0);
-      }
+      out = true;
+      break;
     }
-    if (false==illegal) out.add(mv0);
   }
   return out;
 }
@@ -142,10 +143,13 @@ private static ArrayList<byte[][]> recursive_ai_enhanced(char[][][] board1, char
     negative_next_board_score = (byte) (-current_board_score + 
                               piece_value(board1[move[1][0]][move[1][1]][1]));
     if (N>0)
-    {                     
+    { 
+      char[][][] board2 = execute_move(board1, move[0], move[1]) ;        
       scores[i] = get_min_or_max_enhanced(
-        execute_move(board1, move[0], move[1]), 
+        board2, 
         new_move_color, N, wcs, negative_next_board_score);
+      if (filter_illegal_moves(board2, get_moves(board2, new_move_color)).size()==0)
+        scores[i]=0;
     }
     else
     {

@@ -18,12 +18,15 @@ def java_board_string(board):
                 else:
                     out+='='
     return out
-def java_ai(board, color, N=4, file = 'next_move'):
+def java_ai(board, color, N=4, file = 'next_move', special_option=None):
     t0 = time.time()
     string = java_board_string(board)
     print(string)
+    cmd = ['java',file, string, color, str(N)]
+    if special_option:
+        cmd.append(special_option)
     move =  subprocess.run(
-                        ['java',file, string, color, str(N)],
+                        cmd,
                         check=True, 
                         stdout=subprocess.PIPE).stdout.decode('ascii')
     move = [int(x) for x in move.split(',')]
