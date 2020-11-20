@@ -46,26 +46,32 @@ public class next_move {
   public static void main(String[] args) {
 
     char[][][] board = construct_board(args[0]);
-    //print_board(board);
+    print_board(board);
     char clr = args[1].charAt(0);
     byte N = (byte) (Integer.parseInt(args[2]));
     boolean check = false;
-    boolean to_death=false;
-    if (args.length > 3)
-    {
-      if (args[3].equals("list_all"))
-        check=true;
-      else if (args[3].equals("kill_king"))
-        to_death=true;
-    }
+    boolean legal=false;
+    char specialty_piece = 'k';
+
+    if (args[3].equals("list_all"))
+      check=true;
+    else if (args[3].equals("legal"))
+      legal=true;
+    
+    if (args[4].equals("pawn"))
+      specialty_piece = 'p';
+    
+    byte extra_moves_ = (byte) (Integer.parseInt(args[5]));
+        
+      
     
 
     
-    ArrayList<byte[][]> mvs = recursive_ai_enhanced(board, clr, N);// aggressive_ai(board, clr);
-    if (false==to_death)
-      mvs = filter_illegal_moves(board, mvs);
+    ArrayList<byte[][]> mvs = recursive_ai_enhanced(board, clr, N, extra_moves_ ,specialty_piece);
+    if (legal) // don't allow illegal moves: 
+      mvs = filter_illegal_moves(board, mvs); 
     
-    if (mvs.size()==0)
+    if (mvs.size()==0) // if none of those moves were legal, find a group that are
     {
       mvs = get_moves(board, clr);
       mvs = filter_illegal_moves(board, get_moves(board, clr));
@@ -80,10 +86,14 @@ public class next_move {
     }
     else
     {
-      Random rando = new Random();
-      int rand_i = rando.nextInt(mvs.size());
-      byte[][] mv0 = mvs.get(rand_i);
-      System.out.print(mv0[0][0] + "," + mv0[0][1] + "," + mv0[1][0] + "," + mv0[1][1]);
+      if (mvs.size()>0)
+      {
+        Random rando = new Random();
+        int rand_i = rando.nextInt(mvs.size());
+        byte[][] mv0 = mvs.get(rand_i);
+        System.out.print(mv0[0][0] + "," + mv0[0][1] + "," + mv0[1][0] + "," + mv0[1][1]);
+      }
+      else System.out.println("STALEMATE");
     }
   }
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -131,7 +141,12 @@ private static boolean in_check(char[][][] board, char color)
   }
   return out;
 }
-private static ArrayList<byte[][]> recursive_ai_enhanced(char[][][] board1, char color, byte N)
+private static ArrayList<byte[][]> recursive_ai_enhanced(
+  char[][][] board1, 
+  char color, 
+  byte N,
+  byte extra_moves,
+  char special_piece)
 {
   ArrayList<byte[][]> mvs = get_moves(board1, color);
   byte[] scores = new byte[mvs.size()];
@@ -142,26 +157,37 @@ private static ArrayList<byte[][]> recursive_ai_enhanced(char[][][] board1, char
   byte wcs = -127; // start as the worst possible
   byte current_board_score = board_score(board1, color);
   byte negative_next_board_score;
+  byte updated_extra_moves;
+  byte updated_N;
   for (int i=0; i<mvs.size(); i++)
   {
     byte[][] move = mvs.get(i);
+    updated_extra_moves = extra_moves; // reset for every move
+    updated_N = N; // reset for every move
+    char attacking_piece = board1[move[0][0]][move[0][1]][1];
+    char attacked_piece = board1[move[1][0]][move[1][1]][1];
     negative_next_board_score = (byte) (-current_board_score + 
-                              piece_value(board1[move[1][0]][move[1][1]][1]));
+                              piece_value(attacked_piece));
     if (N>0)
-    { /**
-      if (false)//(board1[move[1][0]][move[1][1]][1] == 'b') This is the harmful code
-        ;//scores[i] = 127;
-      else
-      */
-      //{
-        char[][][] board2 = execute_move(board1, move[0], move[1]) ;        
-        scores[i] = get_min_or_max_enhanced(
-          board2, 
-          new_move_color, N, wcs, negative_next_board_score);
-        //if (filter_illegal_moves(board2, get_moves(board2, new_move_color)).size()==0)
-        //  scores[i]=0;
-      //}
-      
+    { 
+      if (attacking_piece == special_piece && extra_moves>0)
+      { // if the piece you are using to attack is your specialty, look further
+        updated_N += 1;
+        updated_extra_moves -= 1;
+      }
+      char[][][] board2 = execute_move(board1, move[0], move[1]);        
+      scores[i] = get_min_or_max_enhanced(
+        board2, 
+        new_move_color, 
+        updated_N, 
+        wcs, 
+        negative_next_board_score,
+        special_piece,
+        updated_extra_moves);
+      if (filter_illegal_moves(board2, get_moves(board2, new_move_color)).size()==0 && 
+      false==in_check(board2, new_move_color))
+        scores[i]=0;
+     
     }
     else
     {
@@ -171,7 +197,6 @@ private static ArrayList<byte[][]> recursive_ai_enhanced(char[][][] board1, char
     {
       wcs = scores[i];
     }
-    //board_score(execute_move(board1,move[0], move[1]), color);
   }
   byte max_score = scores[max_index(scores)];
   ArrayList<byte[][]> out = new ArrayList<byte[][]>();
@@ -189,7 +214,9 @@ private static byte get_min_or_max_enhanced(
         char move_color,
         byte n_left,
         byte wcs,
-        byte current_board_score)
+        byte current_board_score,
+        char special_piece,
+        byte extra_moves)
   /** The idea is as follows: suppose white is thinking ahead and comes up with a
    * move in which he can force a gain of 5 points. He is now considering his next
    * possible move but discovers that if he does that black can then force that white
@@ -210,17 +237,33 @@ private static byte get_min_or_max_enhanced(
         char new_move_color;
         if (move_color=='w'){ new_move_color = 'b'; }
         else { new_move_color = 'w'; }
+        byte updated_extra_moves;
+        byte updated_N;
         for (int i=0; i<mvs.size(); i++)
-        {
+        { 
+          updated_extra_moves = extra_moves; // reset for every move
+          updated_N = n_left; // reset for every move
           byte[][] move = mvs.get(i);
+          char attacking_piece = board1[move[0][0]][move[0][1]][1];
+          char attacked_piece = board1[move[1][0]][move[1][1]][1];
+          if (attacking_piece == special_piece && extra_moves>0)
+          { // if the piece you are attacking is your specialty, look further
+            updated_N += 1;
+            updated_extra_moves -= 1;
+          }
           negative_next_board_score = (byte) (-current_board_score + 
                       piece_value(board1[move[1][0]][move[1][1]][1]));
-          if (board1[move[1][0]][move[1][1]][1] == 'k')
+          if (attacked_piece == 'k')
             scores[i] = (byte) (100 + n_left);//127; // and don't go deeper
           else 
             scores[i] = get_min_or_max_enhanced(
             execute_move(board1, move[0], move[1]), 
-            new_move_color, (byte) (n_left-1), new_wcs, negative_next_board_score);
+            new_move_color, 
+            (byte) (updated_N-1), 
+            new_wcs, 
+            negative_next_board_score,
+            special_piece,
+            updated_extra_moves);
           if (new_wcs < scores[i]) // if there's a better path,
           {// there is a new worst case scenario
             new_wcs = scores[i];

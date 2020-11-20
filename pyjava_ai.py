@@ -18,11 +18,15 @@ def java_board_string(board):
                 else:
                     out+='='
     return out
-def java_ai(board, color, N=4, file = 'next_move', special_option=None):
+def java_ai(board, color, N=4, 
+            special_option='legal',
+            specialty = 'pawn', 
+            extra_moves = 0,
+            file = 'next_move'):
     t0 = time.time()
     string = java_board_string(board)
     #print(string)
-    cmd = f"java {file} {string} {color} {N} {special_option}"
+    cmd = f"java {file} {string} {color} {N} {special_option} {specialty} {extra_moves}"
     print(cmd)
     cmd = cmd.split()
     #if special_option:
@@ -43,6 +47,8 @@ if __name__ == "__main__":
     vb = gen_standard_board()
     print(java_ai(vb, 'b'))
     '''
+    from functools import partial
     root = tk.Tk()
-    b1 = Board(root, ai = java_ai)
+    my_ai = partial(java_ai, **{'N':4,'extra_moves':1})
+    b1 = Board(root, ai = my_ai)
     root.mainloop()
