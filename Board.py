@@ -63,7 +63,7 @@ class Board(ttk.Frame):
                         self.paint_checkerboard()
                         self.execute_sq_move(c1,c2)
                         vb = VBoard(self.sq_dict)
-                        print(vb)
+                        #print(vb)
                         self.change_turn()
                         if not in_checkmate(vb, self.turn):
                             self.parent.update()
@@ -82,11 +82,13 @@ class Board(ttk.Frame):
                         print('checkmate')
                 else: # if there are two ais:
                     vb = VBoard(self.sq_dict)
-                    brk = False
+                    #brk = False
                     for i in range(150): 
                         t0 = time.time()
-                        if not self.has_two_kings():
-                            brk=True
+                        if in_checkmate(vb,self.turn):
+                            break
+                        #if not self.has_two_kings():
+                        #    brk=True
                         if self.turn=='w':
                             c3,c4 = self.ai(vb, self.turn)
                         else: 
@@ -97,9 +99,9 @@ class Board(ttk.Frame):
                         self.change_turn()
                         self.parent.update()
                         vb = VBoard(self.sq_dict)
-                        if brk:
-                            print('king slain')
-                            break
+                        #if brk:
+                        #    print('king slain')
+                        #    break
                         if t1-t0 < 2:
                             sleep(2-t1+t0)
                         #sleep(1)
@@ -147,8 +149,8 @@ class Board(ttk.Frame):
             return False
 if __name__ == '__main__':
     from pyjava_ai import java_ai
-    ai1 = partial(java_ai, **{'N':4, 'special_option': 'kill_king'})
-    ai2 = partial(java_ai, **{'N':4, 'special_option': 'kill_king'})
+    ai1 = partial(java_ai, **{'N':4, 'special_option': 'None'})
+    ai2 = partial(java_ai, **{'N':3, 'special_option': 'None'})
     root = tk.Tk()
     #root.protocol("WM_DELETE_WINDOW", quit_window())
     b1 = Board(root, ai = ai1, ai2 = ai2)

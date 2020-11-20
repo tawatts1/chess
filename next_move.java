@@ -87,7 +87,12 @@ public class next_move {
     }
   }
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+/**
+private static byte[][] choose_aggresive_moves(ArrayList<byte[][]> moves)
+{
 
+}
+*/
 private static ArrayList<byte[][]> filter_illegal_moves(char[][][] board, ArrayList<byte[][]> moves)
 {
   ArrayList<byte[][]> out = new ArrayList<byte[][]>();
@@ -143,13 +148,20 @@ private static ArrayList<byte[][]> recursive_ai_enhanced(char[][][] board1, char
     negative_next_board_score = (byte) (-current_board_score + 
                               piece_value(board1[move[1][0]][move[1][1]][1]));
     if (N>0)
-    { 
-      char[][][] board2 = execute_move(board1, move[0], move[1]) ;        
-      scores[i] = get_min_or_max_enhanced(
-        board2, 
-        new_move_color, N, wcs, negative_next_board_score);
-      if (filter_illegal_moves(board2, get_moves(board2, new_move_color)).size()==0)
-        scores[i]=0;
+    { /**
+      if (false)//(board1[move[1][0]][move[1][1]][1] == 'b') This is the harmful code
+        ;//scores[i] = 127;
+      else
+      */
+      //{
+        char[][][] board2 = execute_move(board1, move[0], move[1]) ;        
+        scores[i] = get_min_or_max_enhanced(
+          board2, 
+          new_move_color, N, wcs, negative_next_board_score);
+        //if (filter_illegal_moves(board2, get_moves(board2, new_move_color)).size()==0)
+        //  scores[i]=0;
+      //}
+      
     }
     else
     {
@@ -203,7 +215,10 @@ private static byte get_min_or_max_enhanced(
           byte[][] move = mvs.get(i);
           negative_next_board_score = (byte) (-current_board_score + 
                       piece_value(board1[move[1][0]][move[1][1]][1]));
-          scores[i] = get_min_or_max_enhanced(
+          if (board1[move[1][0]][move[1][1]][1] == 'k')
+            scores[i] = (byte) (100 + n_left);//127; // and don't go deeper
+          else 
+            scores[i] = get_min_or_max_enhanced(
             execute_move(board1, move[0], move[1]), 
             new_move_color, (byte) (n_left-1), new_wcs, negative_next_board_score);
           if (new_wcs < scores[i]) // if there's a better path,
@@ -225,9 +240,10 @@ private static byte get_min_or_max_enhanced(
         for (int i=0; i<mvs.size(); i++)
         {
           byte[][] move = mvs.get(i);
-          scores[i] = (byte) (-current_board_score + piece_value(board1[move[1][0]][move[1][1]][1]));
-          //board_score(execute_move(board1,move[0], move[1]), move_color);
-          //System.out.println(scores[i]);
+          if (board1[move[1][0]][move[1][1]][1] == 'k')
+            scores[i] = (byte) (100 + n_left); // and don't go deeper
+          else 
+            scores[i] = (byte) (-current_board_score + piece_value(board1[move[1][0]][move[1][1]][1]));
           if (scores[i] > -wcs)
             {
               break;

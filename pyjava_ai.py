@@ -21,10 +21,12 @@ def java_board_string(board):
 def java_ai(board, color, N=4, file = 'next_move', special_option=None):
     t0 = time.time()
     string = java_board_string(board)
-    print(string)
-    cmd = ['java',file, string, color, str(N)]
-    if special_option:
-        cmd.append(special_option)
+    #print(string)
+    cmd = f"java {file} {string} {color} {N} {special_option}"
+    print(cmd)
+    cmd = cmd.split()
+    #if special_option:
+    #    cmd.append(special_option)
     move =  subprocess.run(
                         cmd,
                         check=True, 
