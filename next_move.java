@@ -46,7 +46,7 @@ public class next_move {
   public static void main(String[] args) {
 
     char[][][] board = construct_board(args[0]);
-    print_board(board);
+    //print_board(board);
     char clr = args[1].charAt(0);
     byte N = (byte) (Integer.parseInt(args[2]));
     boolean check = false;
@@ -60,7 +60,9 @@ public class next_move {
     
     if (args[4].equals("pawn"))
       specialty_piece = 'p';
-    
+    else if (args[4].equals("knight"))
+      specialty_piece = 'n';
+
     byte extra_moves_ = (byte) (Integer.parseInt(args[5]));
         
       
@@ -459,10 +461,16 @@ private static byte get_min_or_max_enhanced(
     char[] piece = board1[c1[0]][c1[1]];
     board1[c2[0]][c2[1]] = piece;
     board1[c1[0]][c1[1]] = EMPTY; 
+    //handle queen promotion:
+    if (piece[1] == 'p' && piece[0]=='b' && board1[c2[0]][c2[1]][0] == 7)
+      board1[c2[0]][c2[1]] = BQ;
+    else if (piece[1] == 'p' && piece[0]=='w' && board1[c2[0]][c2[1]][0] == 0)
+      board1[c2[0]][c2[1]] = WQ;
     return board1;
   }
   private static ArrayList<byte[][]> get_moves(char[][][] board, char color)
   { // returns all moves for a certain color
+    // now adding break statement for efficiency
     ArrayList<byte[][]> out = new ArrayList<byte[][]>();
     //byte[][] mv = new byte[2][2];
     byte[] c1 = new byte[2];

@@ -20,7 +20,7 @@ def java_board_string(board):
     return out
 def java_ai(board, color, N=4, 
             special_option='legal',
-            specialty = 'pawn', 
+            specialty = 'knight', 
             extra_moves = 0,
             file = 'next_move'):
     t0 = time.time()
