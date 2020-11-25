@@ -24,6 +24,7 @@ string1:
 2,5,3,4
 2,5,2,6
 2,5,2,7
+72
 
 string 2: 
 describes a mid game scenario with both queens out and 
@@ -38,6 +39,7 @@ most pieces still alive
 2,5,0,4
 2,7,3,7
 3,1,4,0
+80
 
 string3: 
 early game scenario threatening queen
@@ -45,20 +47,24 @@ early game scenario threatening queen
 2,7,0,6
 3,6,3,3
 3,6,2,5
+32
 
 string4:
 threaten queen directly
 3,6,2,5
 3,6,0,3
+16
+
 '''
 #print(string)
-for string in [string6]:#string1, string2, string3, string4]:
+for string in [string1, string2, string3, string4]:
     t0 = time.time()
     move =  subprocess.run(
-                        ['java',file, string,'w','3', 'list_all'],
+                        ['java',file, string,'b','4', 'list_all', 'knight', '0'],
                         check=True, 
                         stdout=subprocess.PIPE).stdout.decode('ascii')
     print(move)
     #move = [int(x) for x in move.split(',')]
+    print(len(move))
     print('time: ', time.time()-t0)
     print()

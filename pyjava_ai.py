@@ -49,6 +49,6 @@ if __name__ == "__main__":
     '''
     from functools import partial
     root = tk.Tk()
-    my_ai = partial(java_ai, **{'N':4,'extra_moves':1})
+    my_ai = partial(java_ai, **{'N':4,'extra_moves':0})
     b1 = Board(root, ai = my_ai)
     root.mainloop()
