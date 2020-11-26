@@ -32,24 +32,11 @@ public class next_move {
   }
   **/
 
-  public  static final char[] EMPTY = { '0', '0' };
-  public  static final char[] BQ = { 'b', 'q' };
-  public  static final char[] WQ = { 'w', 'q' };
-
-  private static final char[] BP = { 'b', 'p' };
-  private static final char[] WP = { 'w', 'p' };
-  private static final char[] BK = { 'b', 'k' };
-  private static final char[] WK = { 'w', 'k' };
-  private static final char[] BB = { 'b', 'b' };
-  private static final char[] WB = { 'w', 'b' };
-  private static final char[] BN = { 'b', 'n' };
-  private static final char[] WN = { 'w', 'n' };
-  private static final char[] BR = { 'b', 'r' };
-  private static final char[] WR = { 'w', 'r' };
+  
 
   public static void main(String[] args) {
 
-    char[][][] board = construct_board(args[0]);
+    char[][][] board = operations.construct_board(args[0]);
     //print_board(board);
     char clr = args[1].charAt(0);
     byte N = (byte) (Integer.parseInt(args[2]));
@@ -79,8 +66,8 @@ public class next_move {
     
     if (mvs.size()==0) // if none of those moves were legal, find a group that are
     {
-      mvs = get_moves(board, clr);
-      mvs = filter_illegal_moves(board, get_moves(board, clr));
+      mvs = moves.get_moves(board, clr);
+      mvs = filter_illegal_moves(board, moves.get_moves(board, clr));
     }
     
     if (check)
@@ -136,7 +123,7 @@ private static boolean in_check(char[][][] board, char color)
       }
     }
   }
-  ArrayList<byte[][]> mvs = get_moves(board, other_color);
+  ArrayList<byte[][]> mvs = moves.get_moves(board, other_color);
   for (byte[][] mv : mvs)
   {
     if (mv[1][0] == king_coords[0] && mv[1][1] == king_coords[1])
@@ -173,7 +160,7 @@ private static ArrayList<byte[][]> recursive_ai_enhanced(
     }
   }
 
-  ArrayList<byte[][]> mvs = get_moves(board1, my_coords);
+  ArrayList<byte[][]> mvs = moves.get_moves(board1, my_coords);
   byte[] scores = new byte[mvs.size()];
 
   
@@ -214,7 +201,7 @@ private static ArrayList<byte[][]> recursive_ai_enhanced(
         updated_extra_moves,
         upd_enemy_coords,
         upd_my_coords);
-      if (filter_illegal_moves(board2, get_moves(board2, new_move_color)).size()==0 && 
+      if (filter_illegal_moves(board2, moves.get_moves(board2, new_move_color)).size()==0 && 
       false==in_check(board2, new_move_color))
         scores[i]=0;
      
@@ -228,7 +215,7 @@ private static ArrayList<byte[][]> recursive_ai_enhanced(
       wcs = scores[i];
     }
   }
-  byte max_score = scores[max_index(scores)];
+  byte max_score = scores[operations.max_index(scores)];
   ArrayList<byte[][]> out = new ArrayList<byte[][]>();
   for (int i=0; i<mvs.size(); i++)
   {
@@ -257,7 +244,7 @@ private static byte get_min_or_max_enhanced(
   
   {
     byte out=0;
-    ArrayList<byte[][]> mvs = get_moves(board1, move_color);
+    ArrayList<byte[][]> mvs = moves.get_moves(board1, move_color);
     byte new_wcs = -127; // start as the worst possible
     if (mvs.size()>0)
     {
@@ -305,7 +292,7 @@ private static byte get_min_or_max_enhanced(
           }
           //board_score(operations.execute_move(board1,move[0], move[1]), move_color);
         }
-        out = scores[max_index(scores)];
+        out = scores[operations.max_index(scores)];
         
       }
       else
@@ -324,8 +311,8 @@ private static byte get_min_or_max_enhanced(
             }
             
         }
-        //System.out.println(scores[max_index(scores)]);
-        out = scores[max_index(scores)];
+        //System.out.println(scores[operations.max_index(scores)]);
+        out = scores[operations.max_index(scores)];
       }
     }
     else {out=0;}
@@ -352,7 +339,7 @@ private static byte get_min_or_max_enhanced(
 {
 byte out=0;
 //calculate moves using known coordinates to increase speed
-ArrayList<byte[][]> mvs = get_moves(board1, my_coords);
+ArrayList<byte[][]> mvs = moves.get_moves(board1, my_coords);
 byte new_wcs = -127; // start as the worst possible
 if (mvs.size()>0)
 {
@@ -406,7 +393,7 @@ if (mvs.size()>0)
       }
       //board_score(operations.execute_move(board1,move[0], move[1]), move_color);
     }
-    out = scores[max_index(scores)];
+    out = scores[operations.max_index(scores)];
     
   }
   else
@@ -425,8 +412,8 @@ if (mvs.size()>0)
         }
         
     }
-    //System.out.println(scores[max_index(scores)]);
-    out = scores[max_index(scores)];
+    //System.out.println(scores[operations.max_index(scores)]);
+    out = scores[operations.max_index(scores)];
   }
 }
 else {out=0;}
@@ -435,92 +422,10 @@ return (byte) (-out);
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 /**
-  private static ArrayList<byte[][]> recursive_ai(char[][][] board1, char color, byte N) {
-    //
-    ArrayList<byte[][]> mvs = get_moves(board1, color);
-    byte[] scores = new byte[mvs.size()];
-
-    ExecutorService executor = (ExecutorService) Executors.newFixedThreadPool(3);// !!!
-    List<Callable<Byte>> callableTasks = new ArrayList<>();
-
-    char new_move_color;
-    if (color == 'w') {
-      new_move_color = 'b';
-    } else {
-      new_move_color = 'w';
-    }
-
-    for (int i = 0; i < mvs.size(); i++) {
-      // add all scoring methods after one move to a collection
-      byte[][] move = mvs.get(i);
-      char[][][] board2 = operations.execute_move(board1, move[0], move[1]);
-      callableTasks.add(new thread_score(board2, new_move_color, N));
-    }
-    List<Future<Byte>> result = null;
-    try {
-      result = executor.invokeAll(callableTasks);
-      executor.shutdown();
-      for (int i=0; i<scores.length; i++) 
-      {
-        scores[i] = result.get(i).get();
-      }
-    } catch (InterruptedException | ExecutionException e) {
-      e.printStackTrace();
-    }
-    byte max_score = scores[max_index(scores)];
-    ArrayList<byte[][]> out = new ArrayList<byte[][]>();
-    for (int i=0; i<mvs.size(); i++)
-    {
-      if (max_score == scores[i])
-      {
-        out.add(mvs.get(i));
-      }
-    }
-    return out;
-  }
-  private static byte get_min_or_max(
-          char[][][] board1, 
-          char move_color,
-          byte n_left)
-    {
-      byte out=0;
-      ArrayList<byte[][]> mvs = get_moves(board1, move_color);
-      if (mvs.size()>0)
-      {
-        if (n_left > 1)
-        {
-            byte[] scores = new byte[mvs.size()];
-            char new_move_color;
-            if (move_color=='w'){ new_move_color = 'b'; }
-            else { new_move_color = 'w'; }
-            for (int i=0; i<mvs.size(); i++)
-            {
-              byte[][] move = mvs.get(i);
-              scores[i] = get_min_or_max(
-                operations.execute_move(board1, move[0], move[1]), new_move_color, (byte) (n_left-1));
-            }
-            out = scores[max_index(scores)];
-          
-        }
-        else
-        {
-          byte[] scores = new byte[mvs.size()];
-          for (int i=0; i<mvs.size(); i++)
-          {
-            byte[][] move = mvs.get(i);
-            scores[i] = board_score(operations.execute_move(board1,move[0], move[1]), move_color);
-          }
-          
-          out = scores[max_index(scores)];
-        }
-      }
-      else {out=0;}
-      return (byte) (-out);
-    }
   private static byte[][] aggressive_ai(char[][][] board1, char color)
   {
    
-    ArrayList<byte[][]> mvs = get_moves(board1, color);
+    ArrayList<byte[][]> mvs = moves.get_moves(board1, color);
     //char[][][] board2 = new char[8][8][2];
     byte[] scores = new byte[mvs.size()];
     for (int i=0; i<mvs.size(); i++)
@@ -529,442 +434,9 @@ return (byte) (-out);
       scores[i] = board_score(operations.execute_move(board1,move[0], move[1]), color);
     }
     
-    return mvs.get(max_index(scores));
+    return mvs.get(operations.max_index(scores));
   }
   **/
-  private static int max_index(byte[] arr)
-  {
-    //byte out = 0;
-    int max_i = 0;
-    for (int i=0; i<arr.length; i++)
-    {
-      if (arr[i] > arr[max_i])
-      {
-        max_i = i;
-      }
-    }
-    //System.out.println(arr[max_i]);
-    return max_i;
-  }
-
-  
-  /**
-  private static ArrayList<byte[][]> get_moves(char[][][] board, ArrayList<byte[]> coords)
-  { // returns all moves for a certain color
-    
-    ArrayList<byte[][]> out = new ArrayList<byte[][]>();
-    //byte[][] mv = new byte[2][2];
-    //byte[] c1 = new byte[2];
-    byte[] c2 = new byte[2];
-    byte[][] mv = new byte[2][2];
-    ArrayList<byte[]> piece_moves = new ArrayList<byte[]>();
-    char color = board[coords.get(0)[0]][coords.get(0)[1]][0];
-    for (byte[] coord : coords)
-    {
-      piece_moves = moves(board, coord, color);
-      for (int k=0; k<piece_moves.size(); k++)
-        {
-          c2 = piece_moves.get(k);
-          mv[0] = coord; mv[1] = c2;
-          out.add(mv.clone());
-        }
-    }
-    return out;
-  }*/
-  private static ArrayList<byte[][]> get_moves(char[][][] board, char color)
-  { // returns all moves for a certain color
-    ArrayList<byte[][]> out = new ArrayList<byte[][]>();
-    //byte[][] mv = new byte[2][2];
-    byte[] c1 = new byte[2];
-    byte[] c2 = new byte[2];
-    //byte[][] mv = new byte[2][2];
-    ArrayList<byte[]> piece_moves = new ArrayList<byte[]>();
-    
-    for (byte i=0; i<8; i++)
-    {
-      for (byte j=0; j<8; j++)
-      {
-        if (board[i][j][0] == color)
-        {
-          c1[0] = i; c1[1] = j;
-          piece_moves = moves(board, c1, color);
-          for (int k=0; k<piece_moves.size(); k++)
-          {
-            c2 = piece_moves.get(k);
-            byte[][] mv = {c1,c2};
-            out.add(mv);//make_copy(c1,c2));
-          }
-          
-        }
-      }
-    }
-    return out;
-  }
-  /**
-  private static byte[][] make_copy(byte[] c1, byte[] c2)
-  {
-    byte[][] out = new byte[2][2];
-    out[0][0] = c1[0]; out[0][1] = c1[1];
-    out[1][0] = c2[0]; out[1][1] = c2[1];
-    return out;
-  }*/
-  /**
-  private static ArrayList<byte[]> moves(char[][][] board, byte[] coords, char color)
-  {
-    ArrayList<byte[]> dirty_moves = moves_pre_check(board, coords, color);
-     
-    return dirty_moves;
-  }*/
-  private static ArrayList<byte[][]> get_moves(char[][][] board, ArrayList<byte[]> coords)
-  {
-    ArrayList<byte[][]> out = new ArrayList<byte[][]>();
-    char piece;// = board[coord[0]][coord[1]][1];
-    char piece_color;// = board[coord[0]][coord[1]][0];
-    byte[] out0 = new byte[2];
-    byte ff; // friendly fire
-    for (byte[] coord : coords)
-    {
-      piece = board[coord[0]][coord[1]][1];
-      piece_color = board[coord[0]][coord[1]][0];
-      //byte[] out0 = new byte[2];
-      //if (piece_color==color)
-      //{
-        switch (piece)
-        {
-          case 'n': 
-            byte[][] moves = {{2,1}, {2,-1}, 
-                              {1,2}, {1,-2}, 
-                              {-1,2},{-1,-2}, 
-                              {-2,1},{-2,-1} };
-            for (byte[] move : moves)//(byte i=0; i<8; i++)
-            {
-              out0 = add_lists(coord, move);
-              if (in_board_space(out0))
-              {
-                ff = friendly_fire(piece_color, board[out0[0]][out0[1]][0]);
-                if (ff != 1)
-                {
-                  out.add(new byte[][] {coord, out0});
-                }
-              }
-            }
-            break;
-
-          case 'b':
-            byte[][] basis = {{1,-1},{1,1}};
-            byte[] sign = {-1,1};
-            byte[] multiplier = {1,2,3,4,5,6,7,8};
-            for (byte sgn : sign)
-            {
-              for (byte[] base : basis)
-              {
-                for (byte i=0; i<8; i++)
-                {
-                  byte alpha = (byte) (multiplier[i]*sgn);
-                  byte[] move = multiply_list(base, alpha);
-                  out0 = add_lists(coord, move);
-                  if (in_board_space(out0))
-                  {
-                    ff = friendly_fire(piece_color, board[out0[0]][out0[1]][0]);
-                    if (ff==0){out.add(new byte[][] {coord, out0});}
-                    else if (ff==1){break;}
-                    else 
-                    {
-                      out.add(new byte[][] {coord, out0});
-                      break;
-                    }
-                  }
-                }
-              }
-            }
-            break;
-          case 'r':
-            byte[][] basis1 = {{1,0},{0,1}};
-            byte[] sign1 = {-1,1};
-            byte[] multiplier1 = {1,2,3,4,5,6,7,8};
-            for (byte sgn : sign1)
-            {
-              for (byte[] base : basis1)
-              {
-                for (byte i=0; i<8; i++)
-                {
-                  byte alpha = (byte) (multiplier1[i]*sgn);
-                  byte[] move = multiply_list(base, alpha);
-                  out0 = add_lists(coord, move);
-                  if (in_board_space(out0))
-                  {
-                    ff = friendly_fire(piece_color, board[out0[0]][out0[1]][0]);
-                    if (ff==0){out.add(new byte[][] {coord, out0});}
-                    else if (ff==1){break;}
-                    else 
-                    {
-                      out.add(new byte[][] {coord, out0});
-                      break;
-                    }
-                  }
-                }
-              }
-            }
-            break;
-          case 'q':
-            byte[][] basis2 = {{1,0},{0,1}, {-1,1},{1,1}};
-              byte[] sign2 = {-1,1};
-              byte[] multiplier2 = {1,2,3,4,5,6,7,8};
-              for (byte sgn : sign2)
-              {
-                for (byte[] base : basis2)
-                {
-                  for (byte i=0; i<8; i++)
-                  {
-                    byte alpha = (byte) (multiplier2[i]*sgn);
-                    byte[] move = multiply_list(base, alpha);
-                    out0 = add_lists(coord, move);
-                    if (in_board_space(out0))
-                    {
-                      ff = friendly_fire(piece_color, board[out0[0]][out0[1]][0]);
-                      if (ff==0){out.add(new byte[][] {coord, out0});}
-                      else if (ff==1){break;}
-                      else 
-                      {
-                        out.add(new byte[][] {coord, out0});
-                        break;
-                      }
-                    }
-                  }
-                }
-              }
-              break;
-
-          case 'k':
-            byte[][] basis3 = {{1,0},{0,1}, {-1,1},{1,1}};
-            byte[] sign3 = {-1,1};
-            //byte[] multiplier3 = {1};
-            for (byte sgn : sign3)
-            {
-              for (byte[] base : basis3)
-              {
-              
-                //byte alpha = (byte) (multiplier3[i]*sgn);
-                byte[] move = multiply_list(base, sgn);
-                out0 = add_lists(coord, move);
-                if (in_board_space(out0))
-                {
-                  ff = friendly_fire(piece_color, board[out0[0]][out0[1]][0]);
-                  if (ff != 1)
-                  {
-                    out.add(new byte[][] {coord, out0});
-                  }
-                }
-              
-              }
-            }
-            break;
-          case 'p':
-            byte sgn = get_pawn_sign(piece_color);
-            byte[] mv0 = {sgn, 0};
-            byte[][] attacks = {{sgn, 1}, {sgn, -1}};
-            out0 = add_lists(coord, mv0);
-            if (in_board_space(out0))
-            {
-              ff = friendly_fire(piece_color, board[out0[0]][out0[1]][0]);
-              if (ff == 0)
-              {
-                out.add(new byte[][] {coord, out0});
-              }
-            }
-            for (byte[] mva : attacks)
-            {
-              out0 = add_lists(coord, mva);
-              if (in_board_space(out0))
-              {
-                ff = friendly_fire(piece_color, board[out0[0]][out0[1]][0]);
-                if (ff == -1)
-                {
-                  out.add(new byte[][] {coord, out0});
-                }
-              }
-            }
-            break;
-          
-        }// end switch statement
-      //}
-      }
-    return out;
-  }
-
-
-  private static ArrayList<byte[]> moves(char[][][] board, byte[] coords, char color)
-  {
-    ArrayList<byte[]> out = new ArrayList<byte[]>();
-    char piece = board[coords[0]][coords[1]][1];
-    char piece_color = board[coords[0]][coords[1]][0];
-    byte[] out0 = new byte[2];
-    //if (piece_color==color)
-    //{
-      byte ff; // friendly fire
-      switch (piece)
-      {
-        case 'n': 
-          byte[][] moves = {{2,1}, {2,-1}, 
-                            {1,2}, {1,-2}, 
-                            {-1,2},{-1,-2}, 
-                            {-2,1},{-2,-1} };
-          for (byte[] move : moves)//(byte i=0; i<8; i++)
-          {
-            out0 = add_lists(coords, move);
-            if (in_board_space(out0))
-            {
-              ff = friendly_fire(piece_color, board[out0[0]][out0[1]][0]);
-              if (ff != 1)
-              {
-                out.add(out0);
-              }
-            }
-          }
-          break;
-
-        case 'b':
-          byte[][] basis = {{1,-1},{1,1}};
-          byte[] sign = {-1,1};
-          byte[] multiplier = {1,2,3,4,5,6,7,8};
-          for (byte sgn : sign)
-          {
-            for (byte[] base : basis)
-            {
-              for (byte i=0; i<8; i++)
-              {
-                byte alpha = (byte) (multiplier[i]*sgn);
-                byte[] move = multiply_list(base, alpha);
-                out0 = add_lists(coords, move);
-                if (in_board_space(out0))
-                {
-                  ff = friendly_fire(piece_color, board[out0[0]][out0[1]][0]);
-                  if (ff==0){out.add(out0);}
-                  else if (ff==1){break;}
-                  else 
-                  {
-                    out.add(out0);
-                    break;
-                  }
-                }
-              }
-            }
-          }
-          break;
-        case 'r':
-          byte[][] basis1 = {{1,0},{0,1}};
-          byte[] sign1 = {-1,1};
-          byte[] multiplier1 = {1,2,3,4,5,6,7,8};
-          for (byte sgn : sign1)
-          {
-            for (byte[] base : basis1)
-            {
-              for (byte i=0; i<8; i++)
-              {
-                byte alpha = (byte) (multiplier1[i]*sgn);
-                byte[] move = multiply_list(base, alpha);
-                out0 = add_lists(coords, move);
-                if (in_board_space(out0))
-                {
-                  ff = friendly_fire(piece_color, board[out0[0]][out0[1]][0]);
-                  if (ff==0){out.add(out0);}
-                  else if (ff==1){break;}
-                  else 
-                  {
-                    out.add(out0);
-                    break;
-                  }
-                }
-              }
-            }
-          }
-          break;
-        case 'q':
-          byte[][] basis2 = {{1,0},{0,1}, {-1,1},{1,1}};
-            byte[] sign2 = {-1,1};
-            byte[] multiplier2 = {1,2,3,4,5,6,7,8};
-            for (byte sgn : sign2)
-            {
-              for (byte[] base : basis2)
-              {
-                for (byte i=0; i<8; i++)
-                {
-                  byte alpha = (byte) (multiplier2[i]*sgn);
-                  byte[] move = multiply_list(base, alpha);
-                  out0 = add_lists(coords, move);
-                  if (in_board_space(out0))
-                  {
-                    ff = friendly_fire(piece_color, board[out0[0]][out0[1]][0]);
-                    if (ff==0){out.add(out0);}
-                    else if (ff==1){break;}
-                    else 
-                    {
-                      out.add(out0);
-                      break;
-                    }
-                  }
-                }
-              }
-            }
-            break;
-
-        case 'k':
-          byte[][] basis3 = {{1,0},{0,1}, {-1,1},{1,1}};
-          byte[] sign3 = {-1,1};
-          //byte[] multiplier3 = {1};
-          for (byte sgn : sign3)
-          {
-            for (byte[] base : basis3)
-            {
-            
-              //byte alpha = (byte) (multiplier3[i]*sgn);
-              byte[] move = multiply_list(base, sgn);
-              out0 = add_lists(coords, move);
-              if (in_board_space(out0))
-              {
-                ff = friendly_fire(piece_color, board[out0[0]][out0[1]][0]);
-                if (ff != 1)
-                {
-                  out.add(out0);
-                }
-              }
-            
-            }
-          }
-          break;
-        case 'p':
-          byte sgn = get_pawn_sign(piece_color);
-          byte[] mv0 = {sgn, 0};
-          byte[][] attacks = {{sgn, 1}, {sgn, -1}};
-          out0 = add_lists(coords, mv0);
-          if (in_board_space(out0))
-          {
-            ff = friendly_fire(piece_color, board[out0[0]][out0[1]][0]);
-            if (ff == 0)
-            {
-              out.add(out0);
-            }
-          }
-          for (byte[] mva : attacks)
-          {
-            out0 = add_lists(coords, mva);
-            if (in_board_space(out0))
-            {
-              ff = friendly_fire(piece_color, board[out0[0]][out0[1]][0]);
-              if (ff == -1)
-              {
-                out.add(out0);
-              }
-            }
-          }
-          break;
-        
-      }// end switch statement
-    //}
-
-    return out;
-  }
-
   
 
   private static byte board_score(char[][][] board, char color)
@@ -1000,113 +472,6 @@ return (byte) (-out);
       case 'k' : out =27; break;
       default :  out = 0; break;
     }
-    return out;
-  }
-
-  private static boolean in_board_space(byte[] out0)
-  {
-    if (out0[0]<8 && out0[0]>-1 && out0[1] < 8 && out0[1] >-1){return true;}
-    else {return false;}
-  }
-  
-  private static char[][][] construct_board(String lst)
-  {
-    char[][][] out = new char[8][8][2];
-    String[] rows = lst.split("=");
-    char color;
-    char name;
-    for (byte i=0; i<8; i++)
-    {
-      //System.out.println(row);
-      char[][] row_l = new char[8][2];
-      String[] pieces = rows[i].split("_");
-      for (byte j=0; j<8; j++)
-      {
-        color = pieces[j].charAt(0);
-        if (color=='0')
-        {
-          row_l[j] = EMPTY;
-        }
-        else if (color=='b')
-        {
-          name = pieces[j].charAt(1);
-          switch (name)
-          {
-            case 'p': row_l[j] = BP; break;
-            case 'q': row_l[j] = BQ; break;
-            case 'k': row_l[j] = BK; break;
-            case 'b': row_l[j] = BB; break;
-            case 'n': row_l[j] = BN; break;
-            case 'r': row_l[j] = BR; break; 
-          }
-        }
-        else if (color == 'w')
-        {
-          name = pieces[j].charAt(1);
-          switch (name)
-          {
-            case 'p': row_l[j] = WP; break;
-            case 'q': row_l[j] = WQ; break;
-            case 'k': row_l[j] = WK; break;
-            case 'b': row_l[j] = WB; break;
-            case 'n': row_l[j] = WN; break;
-            case 'r': row_l[j] = WR; break; 
-          }
-        }
-        
-      }
-      out[i] = row_l;
-    }
-    return out;
-  }
-  private static byte[] add_lists(byte[] l1, byte[] l2)
-  {
-    int size = l1.length;
-    byte[] out = new byte[size];
-    for (int i=0; i<size; i++)
-    {
-      out[i] = (byte) (l1[i] + l2[i]);
-    }
-    return out;
-  }
-  private static byte[] multiply_list(byte[] l1, byte alpha)
-  {
-    int size = l1.length;
-    byte[] out = new byte[size];
-    for (int i=0; i<size; i++)
-    {
-      out[i] = (byte) (l1[i] * alpha);
-    }
-    return out;
-  }
-  private static void print_board(char[][][] board)
-  {
-    for (char[][] row : board)
-    {
-      String row_str = "";
-      for (char[] piece : row)
-      {
-        row_str += "" + piece[0] + piece[1] + "  ";
-      }
-      System.out.println(row_str);
-    }
-  }
-  private static byte get_pawn_sign(char color)
-  {
-    byte out = 0;
-    if (color=='b'){out = 1;}
-    else if (color=='w'){out = -1;}
-    return out;
-  }
-  private static byte friendly_fire(char color0, char color1)
-  {
-    byte out;
-    if      (color1 == '0')   
-      {out = 0;}
-    else if (color0 == color1)
-      {out = 1;}
-    else                      
-      {out = -1;}
     return out;
   }
 
