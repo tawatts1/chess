@@ -66,8 +66,8 @@ public class next_move {
     
     if (mvs.size()==0) // if none of those moves were legal, find a group that are
     {
-      mvs = moves.get_moves(board, clr);
-      mvs = filter_illegal_moves(board, moves.get_moves(board, clr));
+      mvs = moves_methods.get_moves(board, clr);
+      mvs = filter_illegal_moves(board, moves_methods.get_moves(board, clr));
     }
     
     if (check)
@@ -123,7 +123,7 @@ private static boolean in_check(char[][][] board, char color)
       }
     }
   }
-  ArrayList<byte[][]> mvs = moves.get_moves(board, other_color);
+  ArrayList<byte[][]> mvs = moves_methods.get_moves(board, other_color);
   for (byte[][] mv : mvs)
   {
     if (mv[1][0] == king_coords[0] && mv[1][1] == king_coords[1])
@@ -160,7 +160,7 @@ private static ArrayList<byte[][]> recursive_ai_enhanced(
     }
   }
 
-  ArrayList<byte[][]> mvs = moves.get_moves(board1, my_coords);
+  ArrayList<byte[][]> mvs = moves_methods.get_moves(board1, my_coords);
   byte[] scores = new byte[mvs.size()];
 
   
@@ -201,7 +201,7 @@ private static ArrayList<byte[][]> recursive_ai_enhanced(
         updated_extra_moves,
         upd_enemy_coords,
         upd_my_coords);
-      if (filter_illegal_moves(board2, moves.get_moves(board2, new_move_color)).size()==0 && 
+      if (filter_illegal_moves(board2, moves_methods.get_moves(board2, new_move_color)).size()==0 && 
       false==in_check(board2, new_move_color))
         scores[i]=0;
      
@@ -244,7 +244,7 @@ private static byte get_min_or_max_enhanced(
   
   {
     byte out=0;
-    ArrayList<byte[][]> mvs = moves.get_moves(board1, move_color);
+    ArrayList<byte[][]> mvs = moves_methods.get_moves(board1, move_color);
     byte new_wcs = -127; // start as the worst possible
     if (mvs.size()>0)
     {
@@ -339,7 +339,7 @@ private static byte get_min_or_max_enhanced(
 {
 byte out=0;
 //calculate moves using known coordinates to increase speed
-ArrayList<byte[][]> mvs = moves.get_moves(board1, my_coords);
+ArrayList<byte[][]> mvs = moves_methods.get_moves(board1, my_coords);
 byte new_wcs = -127; // start as the worst possible
 if (mvs.size()>0)
 {
@@ -425,7 +425,7 @@ return (byte) (-out);
   private static byte[][] aggressive_ai(char[][][] board1, char color)
   {
    
-    ArrayList<byte[][]> mvs = moves.get_moves(board1, color);
+    ArrayList<byte[][]> mvs = moves_methods.get_moves(board1, color);
     //char[][][] board2 = new char[8][8][2];
     byte[] scores = new byte[mvs.size()];
     for (int i=0; i<mvs.size(); i++)

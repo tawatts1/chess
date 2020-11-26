@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class moves 
+public class moves_methods
 {
     public static ArrayList<byte[][]> get_moves(char[][][] board, ArrayList<byte[]> coords)
   {
