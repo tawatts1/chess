@@ -634,7 +634,7 @@ private static void remove_if_contains(ArrayList<byte[]> arr, byte[] id)
     //byte[][] mv = new byte[2][2];
     //byte[] c1 = new byte[2];
     byte[] c2 = new byte[2];
-    //byte[][] mv = new byte[2][2];
+    byte[][] mv = new byte[2][2];
     ArrayList<byte[]> piece_moves = new ArrayList<byte[]>();
     char color = board[coords.get(0)[0]][coords.get(0)[1]][0];
     for (byte[] coord : coords)
@@ -643,9 +643,8 @@ private static void remove_if_contains(ArrayList<byte[]> arr, byte[] id)
       for (int k=0; k<piece_moves.size(); k++)
         {
           c2 = piece_moves.get(k);
-          byte[][] mv = {coord,c2};
-          out.add(mv);
-          //out.add(make_copy(coord,c2));
+          mv[0] = coord; mv[1] = c2;
+          out.add(mv.clone());
         }
     }
     return out;
@@ -687,13 +686,14 @@ private static void remove_if_contains(ArrayList<byte[]> arr, byte[] id)
     out[1][0] = c2[0]; out[1][1] = c2[1];
     return out;
   }*/
+  /**
   private static ArrayList<byte[]> moves(char[][][] board, byte[] coords, char color)
   {
     ArrayList<byte[]> dirty_moves = moves_pre_check(board, coords, color);
      
     return dirty_moves;
-  }
-  private static ArrayList<byte[]> moves_pre_check(char[][][] board, byte[] coords, char color)
+  }*/
+  private static ArrayList<byte[]> moves(char[][][] board, byte[] coords, char color)
   {
     ArrayList<byte[]> out = new ArrayList<byte[]>();
     char piece = board[coords[0]][coords[1]][1];
