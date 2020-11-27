@@ -22,11 +22,12 @@ def java_ai(board, color, N=4,
             special_option='legal',
             specialty = 'knight', 
             extra_moves = 0,
+            post_strategy = 'None',
             file = 'next_move'):
     t0 = time.time()
     string = java_board_string(board)
     #print(string)
-    cmd = f"java {file} {string} {color} {N} {special_option} {specialty} {extra_moves}"
+    cmd = f"java {file} {string} {color} {N} {special_option} {specialty} {extra_moves} {post_strategy}"
     print(cmd)
     cmd = cmd.split()
     #if special_option:
@@ -49,6 +50,6 @@ if __name__ == "__main__":
     '''
     from functools import partial
     root = tk.Tk()
-    my_ai = partial(java_ai, **{'N':4,'extra_moves':0})
+    my_ai = partial(java_ai, **{'N':4,'extra_moves':1})
     b1 = Board(root, ai = my_ai)
     root.mainloop()

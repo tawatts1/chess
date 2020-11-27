@@ -30,7 +30,7 @@ public class next_move {
   
 
   public static void main(String[] args) {
-
+  //     board_string, color, N, legal, specialty, specialty_num, post_strategy
     char[][][] board = operations.construct_board(args[0]);
     //print_board(board);
     char clr = args[1].charAt(0);
@@ -48,9 +48,10 @@ public class next_move {
       specialty_piece = 'p';
     else if (args[4].equals("knight"))
       specialty_piece = 'n';
-
+    else if (args[4].equals("queen"))
+      specialty_piece = 'q';
     byte extra_moves_ = (byte) (Integer.parseInt(args[5]));
-        
+    
       
     
 
@@ -76,6 +77,11 @@ public class next_move {
     {
       if (mvs.size()>0)
       {
+        //System.out.println(args[6]);
+        if (args[6].equals("pawns"))
+        {
+          mvs = post_strategy.pawns_first(board, mvs);
+        }
         Random rando = new Random();
         int rand_i = rando.nextInt(mvs.size());
         byte[][] mv0 = mvs.get(rand_i);

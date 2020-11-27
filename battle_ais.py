@@ -4,10 +4,10 @@ from functools import partial
 import tkinter as tk
 
 #white ai:
-ai1 = partial(java_ai, **{'N':5, 'special_option': 'None'})
+ai1 = partial(java_ai, **{'N':4, 'special_option': 'None'})
 
 # black ai:
-ai2 = partial(java_ai, **{'N':4, 'specialty':'pawn','extra_moves':2})
+ai2 = partial(java_ai, **{'N':4, 'specialty':'queen','extra_moves':0, 'post_strategy': 'pawns'})
 
 root = tk.Tk()
 #root.protocol("WM_DELETE_WINDOW", quit_window())
