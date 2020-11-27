@@ -162,6 +162,16 @@ public class operations {
     }
     return out;
   }
+  public static byte[] subtract_lists(byte[] l1, byte[] l2)
+  {
+    int size = l1.length;
+    byte[] out = new byte[size];
+    for (int i=0; i<size; i++)
+    {
+      out[i] = (byte) (l1[i] - l2[i]);
+    }
+    return out;
+  }
   public static byte[] multiply_list(byte[] l1, byte alpha)
   {
     int size = l1.length;
