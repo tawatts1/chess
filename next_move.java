@@ -9,27 +9,19 @@ import java.util.Random;
 
 public class next_move {
 /**
-  public static class thread_score implements Callable<Byte> {
-    char[][][] board0;
-    char color;
-    byte N;
+ * public static class thread_score implements Callable<Byte> { char[][][]
+ * board0; char color; byte N;
+ * 
+ * public thread_score(char[][][] board0, char color, byte N) { this.board0 =
+ * board0; this.color = color; this.N = N; }
+ * 
+ * //@Override // not needed? public Byte call() throws Exception { return
+ * get_min_or_max(board0, color, N); } }
+ * 
+ * @throws Exception
+ **/
 
-    public thread_score(char[][][] board0, char color, byte N) {
-      this.board0 = board0;
-      this.color = color;
-      this.N = N;
-    }
-
-    //@Override // not needed?
-    public Byte call() throws Exception {
-      return get_min_or_max(board0, color, N);
-    }
-  }
-  **/
-
-  
-
-  public static void main(String[] args) {
+public static void main(String[] args) throws Exception {
   //     board_string, color, N, legal, specialty, specialty_num, post_strategy
     char[][][] board = operations.construct_board(args[0]);
     //print_board(board);
@@ -50,6 +42,7 @@ public class next_move {
       specialty_piece = 'n';
     else if (args[4].equals("queen"))
       specialty_piece = 'q';
+    
     byte extra_moves_ = (byte) (Integer.parseInt(args[5]));
     
       
@@ -78,9 +71,17 @@ public class next_move {
       if (mvs.size()>0)
       {
         //System.out.println(args[6]);
-        if (args[6].equals("pawns"))
+        switch (args[6])
         {
+        case "kill,pawns" : 
+          mvs = post_strategy.kill(board, mvs);
+        case "pawns" : 
           mvs = post_strategy.pawns_first(board, mvs);
+          break;
+        case "kill" : 
+          mvs = post_strategy.kill(board, mvs);
+          break;
+        default : throw new Exception("Not implemented");
         }
         Random rando = new Random();
         int rand_i = rando.nextInt(mvs.size());

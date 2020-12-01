@@ -62,17 +62,28 @@ class VBoard():
         #occ2 = self.sq_dict[tuple(c2)].occupant
         self.sq_dict[tuple(c1)].change_occupant(None)
         self.sq_dict[tuple(c2)].change_occupant(occ1)
+        if occ1[1] == 'p':
+            if occ1[0]=='w' and c2[0] == 0:
+                self.sq_dict[tuple(c2)].change_occupant('wq')
+            elif occ1[0]=='b' and c2[0] == 7:
+                self.sq_dict[tuple(c2)].change_occupant('bq')
         return self
     def __str__(self):
-        out = ''
+        out = '-'
+        for i in range(8):
+            out += '------+'
+        out+='\n'
         for i in range(8):
             s = ''
             for j in range(8):
                 occ = self.sq_dict[(i,j)].occupant
                 if occ is None:
-                    occ='0'
-                s+= occ + '\t'
-            out +=s + '\n'
+                    occ=' 0'
+                s+= '|  '+occ + '  '
+            out +=s + '|\n-'
+            for i in range(8):
+                out += '------+'
+            out+='\n'
         return out
             
 def gen_standard_board():
