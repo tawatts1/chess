@@ -7,14 +7,15 @@ Created on Sun Sep 13 13:15:21 2020
 """
 
 from Virtual_board import VBoard
+from Square import Square
 import tkinter as tk
 from tkinter import ttk
 #import tkMessageBox
 import time
 from time import sleep
 from functools import partial
-from moves0 import moves, in_checkmate, special_move
-from game_setup import piece_to_fname, standard_game
+from move_calc import moves, in_checkmate, special_move
+from game_setup import piece_to_fname
 from game_ai import random_move
 
 
@@ -32,14 +33,24 @@ class Board(ttk.Frame):
         self.turn = 'w'
         self.setup_new_game()
         self.grid(row=0, column=0)
-        self.old_commands = {}
-        
         
 
     def setup_new_game(self):
-        self.board_sq, self.board_str, self.sq_dict = standard_game(self)
-        self.reset_move_commands()
-        
+        self.vb = VBoard()
+        #self.board_sq, self.board_str, self.sq_dict = standard_game(self)
+        #self.reset_move_commands()
+        self.sq_arr = []
+        for i in range(8):
+            row = []
+            for j in range(8):
+                piece = self.vb[i][j]
+                fname = piece_to_fname(piece)
+                sq = Square(self.parent,
+                            fname = fname)
+                sq.grid(row=i, column=j)
+                row.append(sq)
+            self.sq_arr.append(row)
+
         self.paint_checkerboard()
 
     def highlight_squares(self, i0, indeces):
@@ -134,7 +145,7 @@ class Board(ttk.Frame):
         for i in range(8):
             for j in range(8):
                 bg_color = self.board_color[(i%2+j%2)%2]
-                self.sq_dict[(i,j)].config(bg = bg_color)
+                self.sq_arr[i][j].config(bg = bg_color)
     def change_turn(self):
         self.turn = {'b':'w','w':'b'}[self.turn]
     def has_two_kings(self):
@@ -153,5 +164,5 @@ if __name__ == '__main__':
     ai2 = partial(java_ai, **{'N':2, 'special_option': 'None'})
     root = tk.Tk()
     #root.protocol("WM_DELETE_WINDOW", quit_window())
-    b1 = Board(root, ai = ai1, ai2 = ai2)
+    b1 = Board(root, ai = ai1)#, ai2 = ai2)
     root.mainloop()
