@@ -8,10 +8,10 @@ def java_board_string(board):
     out = ''
     for i in range(8):
         for j in range(8):
-            occ = board.sq_dict[(i,j)].occupant
+            occ = board[i][j]
             if occ is None:
                 occ = '00'
-            out += occ
+            out += occ[0] + occ[1]
             if not i+j==14:
                 if not j==7:
                     out+='_'

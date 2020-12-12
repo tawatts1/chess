@@ -27,7 +27,7 @@ def friendly_fire(vb, coord0, coord_f):
     return ans
 
 def special_move(vb, c1,c2):
-    piece = vb[c1[0][c1[1]]]
+    piece = vb[c1[0]][c1[1]]
     if piece[1] == 'p':
         if piece[0] == 'b' and c1[0] == 6 and c2[0] == 7:
             print('promotion')
