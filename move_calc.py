@@ -17,13 +17,13 @@ def in_board_space(xy, a=0,b=7):
 def friendly_fire(vb, coord0, coord_f):
     occ_0 = vb[coord0[0]][coord0[1]]
     occ_f = vb[coord_f[0]][coord_f[1]]
-    if occ_f is not EMPTY:
+    if occ_f == EMPTY:
+        ans = 0
+    else:
         if occ_0[0] == occ_f[0]:
             ans = 1
         else:
             ans = -1
-    else:
-        ans = 0
     return ans
 
 def special_move(vb, c1,c2):
@@ -76,17 +76,19 @@ def in_stalemate(board):
     else:
         return False 
 def in_check(board, color):
-    king_coord = (0,0)
+    king_coord = (-1,-1)
     enemy_moves = []
     enemy_color = {'b':'w','w':'b'}[color]
     for i in range(8):
         for j in range(8):
             occ = board[i][j]
-            if occ is not ['0','0']:
-                if occ == color + 'k':
+            if occ != EMPTY:
+                if occ == [color, 'k']:
                     king_coord = (i,j)
                 if enemy_color == occ[0]:
                     enemy_moves.extend(moves_pre_check(board, (i,j), enemy_color))
+    if king_coord == (-1,-1):
+        raise ValueError(f"{color} king not found")
     if king_coord in enemy_moves:
         return True
     else:
@@ -118,7 +120,7 @@ def moves_pre_check(board, coords, color):#, friendlies, enemies):
     '''
     piece = board[coords[0]][coords[1]]
     out = []
-    if piece is EMPTY:
+    if piece == EMPTY:
         #print(coords)
         return None
     name = piece[1]
@@ -201,7 +203,5 @@ def moves_pre_check(board, coords, color):#, friendlies, enemies):
 
 
 if __name__ == '__main__':
-    
-    
     pass
 

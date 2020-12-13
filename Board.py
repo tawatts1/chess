@@ -68,10 +68,11 @@ class Board(ttk.Frame):
             sqi = self.sq_arr[i[0]][i[1]]
             
             def cmd(c1, c2):
+                print(self.vb)
                 if not self.ai2:
                     if not in_checkmate(self.vb, self.turn):
                         self.paint_checkerboard()
-                        self.execute_sq_move(c1,c2)
+                        self.execute_move(c1,c2)
                         #print(vb)
                         self.change_turn()
                         if not in_checkmate(self.vb, self.turn):
@@ -80,7 +81,7 @@ class Board(ttk.Frame):
                             # have ai do its thing
                             if self.ai:
                                 c3, c4 = self.ai(self.vb, color = 'b')
-                                self.execute_sq_move(c3,c4)
+                                self.execute_move(c3,c4)
                                 #vb = VBoard(self.sq_dict)
                                 self.change_turn()
                         else:
@@ -91,39 +92,40 @@ class Board(ttk.Frame):
                 else: # if there are two ais:
                     
                     for i in range(150): 
-                        t0 = time.time()
+                        #t0 = time.time()
                         if in_checkmate(self.vb,self.turn):
+                            print(f'CHECKMATE DETECTED for {self.turn}')
+                            print(self.vb)
                             break
                        
                         if self.turn=='w':
                             c3,c4 = self.ai(self.vb, self.turn)
                         else: 
                             c3,c4 = self.ai2(self.vb, self.turn)
-                        t1 = time.time()
+                        #t1 = time.time()
                         
-                        self.execute_sq_move(c3, c4)
+                        self.execute_move(c3, c4)
                         self.change_turn()
                         self.parent.update()
                         
-                        if t1-t0 < 2:
-                            sleep(2-t1+t0)
+                        #if t1-t0 < 2:
+                        #    sleep(2-t1+t0)
                         #sleep(1)
                     else:
                         print('stalemate')
 
             sqi.set_command(partial(cmd, i0, i))
             
-    def execute_sq_move(self, c1, c2):
+    def execute_move(self, c1, c2):
         piece1 = self.vb[c1[0]][c1[1]]
-        piece2 = self.vb[c2[0]][c2[1]]
         spc_mv = special_move(self.vb, c1, c2)
         if spc_mv == 'promotion':
             piece1 = piece1[0] + 'q'
         
         self.sq_arr[c1[0]][c1[1]].change_photo(None)
         fname = piece_to_fname(piece1)
-        self.sq_arr[c2[0]][c1[1]].change_photo(fname)
-        
+        self.sq_arr[c2[0]][c2[1]].change_photo(fname)
+        self.vb = self.vb.execute_move(c1,c2)
         print(c1, ' --> ', c2)
     def reset_move_commands(self, color = 'w'):
         for i in range(8):
@@ -143,9 +145,10 @@ class Board(ttk.Frame):
    
 if __name__ == '__main__':
     from pyjava_ai import java_ai
-    ai1 = partial(java_ai, **{'N':4, 'special_option': 'None'})
+    #partial(java_ai, **{'N':N, 'post_strategy': white})
+    ai1 = partial(java_ai, **{'N':4, 'post_strategy': 'pawns'})
     ai2 = partial(java_ai, **{'N':2, 'special_option': 'None'})
     root = tk.Tk()
     #root.protocol("WM_DELETE_WINDOW", quit_window())
-    b1 = Board(root, ai = ai1)#, ai2 = ai2)
+    b1 = Board(root, ai = ai1, ai2 = ai2)
     root.mainloop()

@@ -40,5 +40,6 @@ class Square(tk.Button):
 if __name__ == '__main__':
     
     root = tk.Tk()
-    s1 = Square(root)
+    s1 = Square(root, fname="images/bq.png")
+    s1.set_command(lambda : s1.change_photo(None))
     root.mainloop()

@@ -36,7 +36,7 @@ class VBoard(list):
         for i in range(8):
             for j in range(8):
                 occ = self[i][j]
-                if occ is not EMPTY and occ[0] == color:
+                if occ != EMPTY and occ[0] == color:
                     mvs = self.moves((i,j), color)
                     for move in mvs:
                         board_1 = self.execute_move((i,j), move)
@@ -110,4 +110,4 @@ if __name__ == '__main__':
     print(b1)
     b1 = b1.execute_move((1,0),(2,0))
     print(b1)
-    print(b1.moves((0,6),'b'))
+    print(b1.moves((1,1),'b'))
