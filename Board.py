@@ -114,7 +114,7 @@ class Board(ttk.Frame):
             max_moves = 150
             for i in range(150): 
                 print(self.vb)
-                
+                self.paint_checkerboard()
                 if in_checkmate(self.vb,self.turn):
                     print(f'CHECKMATE DETECTED: {self.turn} loses')
                     print(self.vb)
@@ -134,18 +134,24 @@ class Board(ttk.Frame):
                 print(f'STALEMATE DETECTED: {max_moves} moves with no winner')
 
     def execute_move(self, c1, c2):
+        '''
+        record move in virtual board and in gui
+        '''
         piece1 = self.vb[c1[0]][c1[1]]
         spc_mv = special_move(self.vb, c1, c2)
         if spc_mv == 'promotion':
             piece1 = piece1[0] + 'q'
         sq1 = self.sq_arr[c1[0]][c1[1]]
         sq2 = self.sq_arr[c2[0]][c2[1]]
+
         sq1.change_photo(None)
         fname = piece_to_fname(piece1)
         sq2.change_photo(fname)
-
+        
+        # indicate the move by changing the background colors
         sq1.config(bg=self.indication_color[(c1[0]%2 + c1[1]%2)%2])
         sq2.config(bg=self.indication_color[(c2[0]%2 + c2[1]%2)%2])
+        #record move in virtual board
         self.vb = self.vb.execute_move(c1,c2)
         print(c1, ' --> ', c2)
         
@@ -158,6 +164,11 @@ class Board(ttk.Frame):
                 square.set_command(cmd0)
 
     def paint_checkerboard(self, reset = True):
+        '''
+        This colors all the squares to their normal color. If reset is False, if
+        there are any move-indicating colored squares, they will remain that 
+        color. Otherwise all will be changed to the standard board colors.
+        '''
         for i in range(8):
             for j in range(8):
                 shade_num = (i%2+j%2)%2
