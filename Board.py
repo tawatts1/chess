@@ -10,7 +10,6 @@ from Virtual_board import VBoard
 from Square import Square
 import tkinter as tk
 from tkinter import ttk
-#import tkMessageBox
 import time
 from time import sleep
 from functools import partial
@@ -22,12 +21,16 @@ from game_ai import random_move
 
 class Board(ttk.Frame):
     def __init__(self, parent, piece_func = piece_to_fname,
-                 board_color = {0:'grey',1:'brown'}, 
+                 board_color = {0:'#FFB310',1:'#990033'},
+                 indication_color =  {0:'#CAA453',1:'#974B64'}, 
+                 highlight_color = "yellow",
                  ai = random_move, ai2 = None):
         super().__init__(parent)
 
         self.parent = parent
         self.board_color = board_color
+        self.indication_color = indication_color
+        self.highlight_color = highlight_color
         self.ai = ai
         self.ai2 = ai2
         self.turn = 'w'
@@ -36,97 +39,116 @@ class Board(ttk.Frame):
         
 
     def setup_new_game(self):
-        self.vb = VBoard()
-        #self.board_sq, self.board_str, self.sq_dict = standard_game(self)
-        #self.reset_move_commands()
+        #each board object will contain a list of lists of piece lists:
+        self.vb = VBoard() # defualt is starting board positions
+        
+        #the 8x8 array of squares, each containing a button:
         self.sq_arr = []
         for i in range(8):
             row = []
             for j in range(8):
                 piece = self.vb[i][j]
                 fname = piece_to_fname(piece)
+                # initiate each square:
                 sq = Square(self.parent,
                             fname = fname)
                 sq.grid(row=i, column=j)
                 row.append(sq)
             self.sq_arr.append(row)
-        self.reset_move_commands()
-        self.paint_checkerboard()
+        
+        self.reset_move_commands() # enables moves
+        self.paint_checkerboard() # paints the light and dark squares
 
     def highlight_squares(self, i0, indeces):
-        self.paint_checkerboard()
+        '''Highlight the squares that the user can move to based on the piece it 
+        just clicked on, and allow the user to do that move by clicking on the 
+        highlighted square. 
+
+        i0: the coordinates of the square just clicked on
+        indeces: the calculated coordinates that piece can move to. 
+
+        If indeces is None it will reset the  move commands, '''
+        self.paint_checkerboard(reset=False) #undo previous highlighting
         if indeces is not None:
             for index in indeces:
                 sq = self.sq_arr[index[0]][index[1]]
-                sq.config(bg = 'yellow')
-            self.enable_move(i0, indeces)
+                sq.config(bg = self.highlight_color)
+                sq.set_command(partial(self.move_command, i0, index))
         else:
             self.reset_move_commands(color = self.turn)
      
-    def enable_move(self, i0, indeces):
-        for i in indeces:
-            sqi = self.sq_arr[i[0]][i[1]]
-            
-            def cmd(c1, c2):
-                print(self.vb)
-                if not self.ai2:
-                    if not in_checkmate(self.vb, self.turn):
-                        self.paint_checkerboard()
-                        self.execute_move(c1,c2)
-                        #print(vb)
-                        self.change_turn()
-                        if not in_checkmate(self.vb, self.turn):
-                            self.parent.update()
-                            
-                            # have ai do its thing
-                            if self.ai:
-                                c3, c4 = self.ai(self.vb, color = 'b')
-                                self.execute_move(c3,c4)
-                                #vb = VBoard(self.sq_dict)
-                                self.change_turn()
-                        else:
-                            print('checkmate')
-                        self.reset_move_commands(color = self.turn)
-                    else:
-                        print('checkmate')
-                else: # if there are two ais:
-                    
-                    for i in range(150): 
-                        #t0 = time.time()
-                        if in_checkmate(self.vb,self.turn):
-                            print(f'CHECKMATE DETECTED for {self.turn}')
-                            print(self.vb)
-                            break
-                       
-                        if self.turn=='w':
-                            c3,c4 = self.ai(self.vb, self.turn)
-                        else: 
-                            c3,c4 = self.ai2(self.vb, self.turn)
-                        #t1 = time.time()
-                        
-                        self.execute_move(c3, c4)
-                        self.change_turn()
-                        self.parent.update()
-                        
-                        #if t1-t0 < 2:
-                        #    sleep(2-t1+t0)
-                        #sleep(1)
-                    else:
-                        print('stalemate')
+    def move_command(self, c1, c2):
+        '''The command that is carried out when the user clicks on a piece, 
+         and then actually clicks on a move to carry it out. c1 and c2 are the
+         coordinates of the piece and the coordinates of where it will go.
+         
+         If there is only one ai, this executes the move, and then initiates the
+         ai deciding a move and then executing that move as well.
 
-            sqi.set_command(partial(cmd, i0, i))
+         If there are two ais, then it will not actually carry out the move, but
+         will initiate each ai choosing moves and then executing them so the user
+         can watch. 
+         '''
+        
+        if not self.ai2: # only one ai
+            if not in_checkmate(self.vb, self.turn):
+                self.paint_checkerboard()
+                self.execute_move(c1,c2)
+                print(self.vb)
+                self.change_turn()
+                if not in_checkmate(self.vb, self.turn):
+                    self.parent.update()
+                    
+                    # have ai do its thing
+                    if self.ai:
+                        c3, c4 = self.ai(self.vb, color = 'b')
+                        self.execute_move(c3,c4)
+                        #vb = VBoard(self.sq_dict)
+                        self.change_turn()
+                else:
+                    print('checkmate')
+                self.reset_move_commands(color = self.turn)
+            else:
+                print('checkmate')
+        else: # if there are two ais:
+            max_moves = 150
+            for i in range(150): 
+                print(self.vb)
+                
+                if in_checkmate(self.vb,self.turn):
+                    print(f'CHECKMATE DETECTED: {self.turn} loses')
+                    print(self.vb)
+                    break
             
+                if self.turn=='w':
+                    c3,c4 = self.ai(self.vb, self.turn)
+                else: 
+                    c3,c4 = self.ai2(self.vb, self.turn)
+                
+                
+                self.execute_move(c3, c4)
+                self.change_turn()
+                self.parent.update()
+                
+            else:
+                print(f'STALEMATE DETECTED: {max_moves} moves with no winner')
+
     def execute_move(self, c1, c2):
         piece1 = self.vb[c1[0]][c1[1]]
         spc_mv = special_move(self.vb, c1, c2)
         if spc_mv == 'promotion':
             piece1 = piece1[0] + 'q'
-        
-        self.sq_arr[c1[0]][c1[1]].change_photo(None)
+        sq1 = self.sq_arr[c1[0]][c1[1]]
+        sq2 = self.sq_arr[c2[0]][c2[1]]
+        sq1.change_photo(None)
         fname = piece_to_fname(piece1)
-        self.sq_arr[c2[0]][c2[1]].change_photo(fname)
+        sq2.change_photo(fname)
+
+        sq1.config(bg=self.indication_color[(c1[0]%2 + c1[1]%2)%2])
+        sq2.config(bg=self.indication_color[(c2[0]%2 + c2[1]%2)%2])
         self.vb = self.vb.execute_move(c1,c2)
         print(c1, ' --> ', c2)
+        
     def reset_move_commands(self, color = 'w'):
         for i in range(8):
             for j in range(8):
@@ -135,11 +157,17 @@ class Board(ttk.Frame):
                                 moves(self.vb, (i,j), color))
                 square.set_command(cmd0)
 
-    def paint_checkerboard(self):
+    def paint_checkerboard(self, reset = True):
         for i in range(8):
             for j in range(8):
-                bg_color = self.board_color[(i%2+j%2)%2]
-                self.sq_arr[i][j].config(bg = bg_color)
+                shade_num = (i%2+j%2)%2
+                sq = self.sq_arr[i][j]
+                old_color = sq.cget('bg')
+                if old_color in self.indication_color.values() and not reset:
+                    bg_color = self.indication_color[shade_num]
+                else:
+                    bg_color = self.board_color[shade_num]
+                    self.sq_arr[i][j].config(bg = bg_color)
     def change_turn(self):
         self.turn = {'b':'w','w':'b'}[self.turn]
    
@@ -150,5 +178,5 @@ if __name__ == '__main__':
     ai2 = partial(java_ai, **{'N':2, 'special_option': 'None'})
     root = tk.Tk()
     #root.protocol("WM_DELETE_WINDOW", quit_window())
-    b1 = Board(root, ai = ai1, ai2 = ai2)
+    b1 = Board(root, ai = ai1)#, ai2 = ai2)
     root.mainloop()
