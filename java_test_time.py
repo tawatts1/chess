@@ -63,7 +63,7 @@ for string in [string1, string2, string3, string4]:
                         ['java',file, string,'b','4', 'list_all', 'knight', '0'],
                         check=True, 
                         stdout=subprocess.PIPE).stdout.decode('ascii')
-    print(move)
+    print(move[:-1])
     #move = [int(x) for x in move.split(',')]
     print(len(move))
     print('time: ', time.time()-t0)

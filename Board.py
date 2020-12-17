@@ -185,8 +185,8 @@ class Board(ttk.Frame):
 if __name__ == '__main__':
     from pyjava_ai import java_ai
     #partial(java_ai, **{'N':N, 'post_strategy': white})
-    ai1 = partial(java_ai, **{'N':4, 'post_strategy': 'pawns'})
-    ai2 = partial(java_ai, **{'N':2, 'special_option': 'None'})
+    ai1 = partial(java_ai, **{'N':3, 'post_strategy': 'pawns'})
+    ai2 = partial(java_ai, **{'N':5, 'special_option': 'None'})
     root = tk.Tk()
     #root.protocol("WM_DELETE_WINDOW", quit_window())
     b1 = Board(root, ai = ai1)#, ai2 = ai2)

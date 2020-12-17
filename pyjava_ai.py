@@ -24,20 +24,25 @@ def java_ai(board, color, N=4,
             extra_moves = 0,
             post_strategy = 'None',
             file = 'next_move'):
-    t0 = time.time()
+    #t0 = time.time()
     string = java_board_string(board)
     #print(string)
-    cmd = f"java {file} {string} {color} {N} {special_option} {specialty} {extra_moves} {post_strategy}"
-    print(cmd)
-    cmd = cmd.split()
+    cmd0 = f"java {file} {string} {color} {N} {special_option} {specialty} {extra_moves} {post_strategy}"
+    print(cmd0)
+    cmd = cmd0.split()
     #if special_option:
     #    cmd.append(special_option)
     move =  subprocess.run(
                         cmd,
                         check=True, 
                         stdout=subprocess.PIPE).stdout.decode('ascii')
-    move = [int(x) for x in move.split(',')]
-    print('time: ', time.time()-t0)
+    try:
+        move = [int(x) for x in move.split(',')]
+    except ValueError:
+        #print(cmd0)
+        print(board)
+        raise ValueError
+    #print('time: ', time.time()-t0)
     return (move[0], move[1]), (move[2], move[3])
 
 
