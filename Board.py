@@ -6,7 +6,7 @@ Created on Sun Sep 13 13:15:21 2020
 @author: ted
 """
 
-from Virtual_board import VBoard
+from Virtual_board import VBoard, WQ, BQ
 from Square import Square
 import tkinter as tk
 from tkinter import ttk
@@ -137,10 +137,11 @@ class Board(ttk.Frame):
         '''
         record move in virtual board and in gui
         '''
-        piece1 = self.vb[c1[0]][c1[1]]
         spc_mv = special_move(self.vb, c1, c2)
         if spc_mv == 'promotion':
-            piece1 = piece1[0] + 'q'
+            self.vb[c1[0]][c1[1]] = {'w':WQ,'b':BQ}[self.vb[c1[0]][c1[1]][0]]
+
+        piece1 = self.vb[c1[0]][c1[1]]  
         sq1 = self.sq_arr[c1[0]][c1[1]]
         sq2 = self.sq_arr[c2[0]][c2[1]]
 
@@ -185,7 +186,7 @@ class Board(ttk.Frame):
 if __name__ == '__main__':
     from pyjava_ai import java_ai
     #partial(java_ai, **{'N':N, 'post_strategy': white})
-    ai1 = partial(java_ai, **{'N':3, 'post_strategy': 'pawns'})
+    ai1 = partial(java_ai, **{'N':0, 'post_strategy': 'pawns'})
     ai2 = partial(java_ai, **{'N':5, 'special_option': 'None'})
     root = tk.Tk()
     #root.protocol("WM_DELETE_WINDOW", quit_window())
