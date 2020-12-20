@@ -1,6 +1,6 @@
 
 import java.util.ArrayList;
-
+import java.util.Collections;
 import java.util.Random;
 
 
@@ -139,6 +139,24 @@ private static boolean in_check(char[][][] board, char color)
   return out;
 }
 
+private static ArrayList<byte[][]> prioritize_moves(char[][][] board, ArrayList<byte[][]> mvs0, char enemy_color)
+{
+  ArrayList<byte[][]> out = new ArrayList<byte[][]>(mvs0);
+
+  int j = 0;
+
+  byte[][] mv = new byte[2][2];
+  for (int i=0; i< mvs0.size(); i++)
+  {
+    mv = mvs0.get(i);
+    if (board[mv[1][0]][mv[1][1]][0] == enemy_color)
+    {
+      Collections.swap(out, i, j++); // swap elements and increment j. 
+    }
+  }
+  return out;
+}
+
 private static ArrayList<byte[][]> recursive_ai_enhanced(
   char[][][] board1, 
   char color, 
@@ -146,9 +164,11 @@ private static ArrayList<byte[][]> recursive_ai_enhanced(
   byte extra_moves,
   char special_piece)
 {
+  // get enemy color
   char new_move_color;
   if (color=='w'){ new_move_color = 'b'; }
   else { new_move_color = 'w'; }
+
   // get initial black and white lists:
   ArrayList<byte[]> my_coords = new ArrayList<byte[]>();
   ArrayList<byte[]> enemy_coords = new ArrayList<byte[]>();
@@ -165,6 +185,7 @@ private static ArrayList<byte[][]> recursive_ai_enhanced(
   }
 
   ArrayList<byte[][]> mvs = moves_methods.get_moves(board1, my_coords);
+  mvs = prioritize_moves(board1, mvs, new_move_color);
   byte[] scores = new byte[mvs.size()];
 
 
@@ -341,8 +362,13 @@ private static byte get_min_or_max_enhanced(
 */  
 {
 byte out=0;
+char new_move_color;
+if (move_color=='w'){ new_move_color = 'b'; }
+else { new_move_color = 'w'; }
 //calculate moves using known coordinates to increase speed
 ArrayList<byte[][]> mvs = moves_methods.get_moves(board1, my_coords);
+mvs = prioritize_moves(board1, mvs, new_move_color);
+
 byte[] scores = new byte[mvs.size()];
 byte new_wcs = -127; // start as the worst possible
 
@@ -350,9 +376,7 @@ byte new_wcs = -127; // start as the worst possible
 if (n_left > 1)
 {
   byte negative_next_board_score;
-  char new_move_color;
-  if (move_color=='w'){ new_move_color = 'b'; }
-  else { new_move_color = 'w'; }
+  
   byte updated_extra_moves;
   byte updated_N;
   for (int i=0; i<mvs.size(); i++)
