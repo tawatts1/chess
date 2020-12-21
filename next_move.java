@@ -9,13 +9,13 @@ import java.util.Random;
 
 public class next_move {
 /**
- * public static class thread_score implements Callable<Byte> { char[][][]
- * board0; char color; byte N;
+ * public static class thread_score implements Callable<int> { char[][][]
+ * board0; char color; int N;
  * 
- * public thread_score(char[][][] board0, char color, byte N) { this.board0 =
+ * public thread_score(char[][][] board0, char color, int N) { this.board0 =
  * board0; this.color = color; this.N = N; }
  * 
- * //@Override // not needed? public Byte call() throws Exception { return
+ * //@Override // not needed? public int call() throws Exception { return
  * get_min_or_max(board0, color, N); } }
  * 
  * @throws Exception
@@ -26,7 +26,7 @@ public static void main(String[] args) throws Exception {
     char[][][] board = operations.construct_board(args[0]);
     //print_board(board);
     char clr = args[1].charAt(0);
-    byte N = (byte) (Integer.parseInt(args[2]));
+    int N = Integer.parseInt(args[2]);
     boolean check = false;
     boolean legal=false;
     char specialty_piece = 'k';
@@ -43,13 +43,13 @@ public static void main(String[] args) throws Exception {
     else if (args[4].equals("queen"))
       specialty_piece = 'q';
     
-    byte extra_moves_ = (byte) (Integer.parseInt(args[5]));
+    int extra_moves_ = Integer.parseInt(args[5]);
     
       
     
 
     
-    ArrayList<byte[][]> mvs = recursive_ai_enhanced(board, clr, N, extra_moves_ ,specialty_piece);
+    ArrayList<int[][]> mvs = recursive_ai_enhanced(board, clr, N, extra_moves_ ,specialty_piece);
     if (legal) // don't allow illegal moves: 
       mvs = filter_illegal_moves(board, mvs); 
     
@@ -61,7 +61,7 @@ public static void main(String[] args) throws Exception {
     
     if (check)
     {
-      for (byte[][] mv0 : mvs)
+      for (int[][] mv0 : mvs)
       {
         System.out.println(mv0[0][0] + "," + mv0[0][1] + "," + mv0[1][0] + "," + mv0[1][1]);
       }
@@ -87,18 +87,18 @@ public static void main(String[] args) throws Exception {
         }
         Random rando = new Random();
         int rand_i = rando.nextInt(mvs.size());
-        byte[][] mv0 = mvs.get(rand_i);
+        int[][] mv0 = mvs.get(rand_i);
         System.out.print(mv0[0][0] + "," + mv0[0][1] + "," + mv0[1][0] + "," + mv0[1][1]);
       }
       else System.out.println("STALEMATE");
     }
   }
 
-private static ArrayList<byte[][]> filter_illegal_moves(char[][][] board, ArrayList<byte[][]> moves)
+private static ArrayList<int[][]> filter_illegal_moves(char[][][] board, ArrayList<int[][]> moves)
 {
-  ArrayList<byte[][]> out = new ArrayList<byte[][]>();
+  ArrayList<int[][]> out = new ArrayList<int[][]>();
   char color = board[moves.get(0)[0][0]][moves.get(0)[0][1]][0];
-  for (byte[][] mv0 : moves)
+  for (int[][] mv0 : moves)
     if (false==in_check(operations.execute_move(board, mv0[0], mv0[1]), color))
       out.add(mv0);
   return out;
@@ -110,10 +110,10 @@ private static boolean in_check(char[][][] board, char color)
   if (color=='b') other_color = 'w';
   else if (color == 'w') other_color = 'b';
   else return true;
-  byte[] king_coords = new byte[2];
-  for (byte i=0; i<8; i++)
+  int[] king_coords = new int[2];
+  for (int i=0; i<8; i++)
   {
-    for (byte j=0; j<8; j++)
+    for (int j=0; j<8; j++)
     {
       if (board[i][j][0] == color && board[i][j][1] == 'k')
       {
@@ -121,8 +121,8 @@ private static boolean in_check(char[][][] board, char color)
       }
     }
   }
-  ArrayList<byte[][]> mvs = moves_methods.get_moves(board, other_color);
-  for (byte[][] mv : mvs)
+  ArrayList<int[][]> mvs = moves_methods.get_moves(board, other_color);
+  for (int[][] mv : mvs)
   {
     if (mv[1][0] == king_coords[0] && mv[1][1] == king_coords[1])
     {
@@ -133,16 +133,16 @@ private static boolean in_check(char[][][] board, char color)
   return out;
 }
 
-private static void prioritize_moves(char[][][] board, ArrayList<byte[][]> mvs0, char enemy_color)
+private static void prioritize_moves(char[][][] board, ArrayList<int[][]> mvs0, char enemy_color)
 {// attacks, direction?
   // attack +10, 
   //for bishop prioritize number of moves (13,11,9,7), 
   //for knight, prioritize number of moves as well(8,...), 
   //queen, number of moves 
-  //ArrayList<byte[][]> out = new ArrayList<byte[][]>(mvs0);
+  //ArrayList<int[][]> out = new ArrayList<int[][]>(mvs0);
 
   
-  byte[][] mv = new byte[2][2];
+  int[][] mv = new int[2][2];
   //int scalar;
   //if (enemy_color == 'b') scalar = -1;
   //else scalar = 1;
@@ -170,11 +170,11 @@ private static void prioritize_moves(char[][][] board, ArrayList<byte[][]> mvs0,
   //return out;
 }
 
-private static ArrayList<byte[][]> recursive_ai_enhanced(
+private static ArrayList<int[][]> recursive_ai_enhanced(
   char[][][] board1, 
   char color, 
-  byte N,
-  byte extra_moves,
+  int N,
+  int extra_moves,
   char special_piece)
 {
   // get enemy color
@@ -183,13 +183,13 @@ private static ArrayList<byte[][]> recursive_ai_enhanced(
   else { new_move_color = 'w'; }
 
   // get initial black and white lists:
-  ArrayList<byte[]> my_coords = new ArrayList<byte[]>();
-  ArrayList<byte[]> enemy_coords = new ArrayList<byte[]>();
-  for (byte i=0; i<8; i++)
+  ArrayList<int[]> my_coords = new ArrayList<int[]>();
+  ArrayList<int[]> enemy_coords = new ArrayList<int[]>();
+  for (int i=0; i<8; i++)
   {
-    for (byte j=0; j<8; j++)
+    for (int j=0; j<8; j++)
     {
-      byte[] coord = {i, j};
+      int[] coord = {i, j};
       if (color == board1[i][j][0])
         my_coords.add(coord);
       else if (new_move_color == board1[i][j][0])
@@ -197,27 +197,27 @@ private static ArrayList<byte[][]> recursive_ai_enhanced(
     }
   }
 
-  ArrayList<byte[][]> mvs = moves_methods.get_moves(board1, my_coords);
+  ArrayList<int[][]> mvs = moves_methods.get_moves(board1, my_coords);
   prioritize_moves(board1, mvs, new_move_color);
-  byte[] scores = new byte[mvs.size()];
+  int[] scores = new int[mvs.size()];
 
 
-  byte wcs = -127; // start as the worst possible
-  byte current_board_score = board_score(board1, color);
-  byte negative_next_board_score;
-  byte updated_extra_moves;
-  byte updated_N;
+  int wcs = -127; // start as the worst possible
+  int current_board_score = board_score(board1, color);
+  int negative_next_board_score;
+  int updated_extra_moves;
+  int updated_N;
   for (int i=0; i<mvs.size(); i++)
   {
-    byte[][] move = mvs.get(i);
-    ArrayList<ArrayList<byte[]>> updated_coords = operations.update_coords(my_coords, enemy_coords, move);
-    ArrayList<byte[]> upd_my_coords = updated_coords.get(0); 
-    ArrayList<byte[]> upd_enemy_coords = updated_coords.get(1); 
+    int[][] move = mvs.get(i);
+    ArrayList<ArrayList<int[]>> updated_coords = operations.update_coords(my_coords, enemy_coords, move);
+    ArrayList<int[]> upd_my_coords = updated_coords.get(0); 
+    ArrayList<int[]> upd_enemy_coords = updated_coords.get(1); 
     updated_extra_moves = extra_moves; // reset for every move
     updated_N = N; // reset for every move
     char attacking_piece = board1[move[0][0]][move[0][1]][1];
     char attacked_piece = board1[move[1][0]][move[1][1]][1]; 
-    negative_next_board_score = (byte) (-current_board_score - 
+    negative_next_board_score = (int) (-current_board_score - 
                               piece_value(attacked_piece));
     if (N>0)
     { 
@@ -226,8 +226,8 @@ private static ArrayList<byte[][]> recursive_ai_enhanced(
         updated_N += 1;
         updated_extra_moves -= 1;
       }
-      //ArrayList<byte[]> upd_my_coords = new ArrayList<byte[]>(my_coords);
-      //ArrayList<byte[]> upd_enemy_coords = new ArrayList<byte[]>(enemy_coords);
+      //ArrayList<int[]> upd_my_coords = new ArrayList<int[]>(my_coords);
+      //ArrayList<int[]> upd_enemy_coords = new ArrayList<int[]>(enemy_coords);
       char[][][] board2 = operations.execute_move(board1, move[0], move[1]);        
       scores[i] = get_min_or_max_enhanced(
         board2, 
@@ -252,8 +252,8 @@ private static ArrayList<byte[][]> recursive_ai_enhanced(
       wcs = scores[i];
     }
   }
-  byte max_score = scores[operations.max_index(scores)];
-  ArrayList<byte[][]> out = new ArrayList<byte[][]>();
+  int max_score = scores[operations.max_index(scores)];
+  ArrayList<int[][]> out = new ArrayList<int[][]>();
   for (int i=0; i<mvs.size(); i++)
   {
     if (max_score == scores[i])
@@ -264,14 +264,14 @@ private static ArrayList<byte[][]> recursive_ai_enhanced(
   return out;
 }
 /**
-private static byte get_min_or_max_enhanced(
+private static int get_min_or_max_enhanced(
         char[][][] board1, 
         char move_color,
-        byte n_left,
-        byte wcs,
-        byte current_board_score,
+        int n_left,
+        int wcs,
+        int current_board_score,
         char special_piece,
-        byte extra_moves)
+        int extra_moves)
   /** The idea is as follows: suppose white is thinking ahead and comes up with a
    * move in which he can force a gain of 5 points. He is now considering his next
    * possible move but discovers that if he does that black can then force that white
@@ -280,25 +280,25 @@ private static byte get_min_or_max_enhanced(
    * In each layer this is implemented it should save about half of the computations. 
   
   {
-    byte out=0;
-    ArrayList<byte[][]> mvs = moves_methods.get_moves(board1, move_color);
-    byte new_wcs = -127; // start as the worst possible
+    int out=0;
+    ArrayList<int[][]> mvs = moves_methods.get_moves(board1, move_color);
+    int new_wcs = -127; // start as the worst possible
     if (mvs.size()>0)
     {
       if (n_left > 1)
       {
-        byte negative_next_board_score;
-        byte[] scores = new byte[mvs.size()];
+        int negative_next_board_score;
+        int[] scores = new int[mvs.size()];
         char new_move_color;
         if (move_color=='w'){ new_move_color = 'b'; }
         else { new_move_color = 'w'; }
-        byte updated_extra_moves;
-        byte updated_N;
+        int updated_extra_moves;
+        int updated_N;
         for (int i=0; i<mvs.size(); i++)
         { 
           updated_extra_moves = extra_moves; // reset for every move
           updated_N = n_left; // reset for every move
-          byte[][] move = mvs.get(i);
+          int[][] move = mvs.get(i);
           char attacking_piece = board1[move[0][0]][move[0][1]][1];
           char attacked_piece = board1[move[1][0]][move[1][1]][1];
           if (attacking_piece == special_piece && extra_moves>0)
@@ -306,15 +306,15 @@ private static byte get_min_or_max_enhanced(
             updated_N += 1;
             updated_extra_moves -= 1;
           }
-          negative_next_board_score = (byte) (-current_board_score + 
+          negative_next_board_score = (int) (-current_board_score + 
                       piece_value(board1[move[1][0]][move[1][1]][1]));
           if (attacked_piece == 'k')
-            scores[i] = (byte) (100 + n_left);//127; // and don't go deeper
+            scores[i] = (int) (100 + n_left);//127; // and don't go deeper
           else 
             scores[i] = get_min_or_max_enhanced(
             operations.execute_move(board1, move[0], move[1]), 
             new_move_color, 
-            (byte) (updated_N-1), 
+            (int) (updated_N-1), 
             new_wcs, 
             negative_next_board_score,
             special_piece,
@@ -334,14 +334,14 @@ private static byte get_min_or_max_enhanced(
       }
       else
       {
-        byte[] scores = new byte[mvs.size()];
+        int[] scores = new int[mvs.size()];
         for (int i=0; i<mvs.size(); i++)
         {
-          byte[][] move = mvs.get(i);
+          int[][] move = mvs.get(i);
           if (board1[move[1][0]][move[1][1]][1] == 'k')
-            scores[i] = (byte) (100 + n_left); // and don't go deeper
+            scores[i] = (int) (100 + n_left); // and don't go deeper
           else 
-            scores[i] = (byte) (-current_board_score + piece_value(board1[move[1][0]][move[1][1]][1]));
+            scores[i] = (int) (-current_board_score + piece_value(board1[move[1][0]][move[1][1]][1]));
           if (scores[i] > -wcs)
             {
               break;
@@ -353,19 +353,19 @@ private static byte get_min_or_max_enhanced(
       }
     }
     else {out=0;}
-    return (byte) (-out);
+    return (int) (-out);
   }
 */
-  private static byte get_min_or_max_enhanced(
+  private static int get_min_or_max_enhanced(
     char[][][] board1, 
     char move_color,
-    byte n_left,
-    byte wcs,
-    byte current_board_score,
+    int n_left,
+    int wcs,
+    int current_board_score,
     char special_piece,
-    byte extra_moves,
-    ArrayList<byte[]> my_coords,
-    ArrayList<byte[]> enemy_coords)
+    int extra_moves,
+    ArrayList<int[]> my_coords,
+    ArrayList<int[]> enemy_coords)
 /** The idea is as follows: suppose white is thinking ahead and comes up with a
 * move in which he can force a gain of 5 points. He is now considering his next
 * possible move but discovers that if he does that black can then force that white
@@ -374,33 +374,33 @@ private static byte get_min_or_max_enhanced(
 * In each layer this is implemented it should save about half of the computations. 
 */  
 {
-byte out=0;
+int out=0;
 char new_move_color;
 if (move_color=='w'){ new_move_color = 'b'; }
 else { new_move_color = 'w'; }
 //calculate moves using known coordinates to increase speed
-ArrayList<byte[][]> mvs = moves_methods.get_moves(board1, my_coords);
+ArrayList<int[][]> mvs = moves_methods.get_moves(board1, my_coords);
 prioritize_moves(board1, mvs, new_move_color);
 
-byte[] scores = new byte[mvs.size()];
-byte new_wcs = -127; // start as the worst possible
+int[] scores = new int[mvs.size()];
+int new_wcs = -127; // start as the worst possible
 
 
 if (n_left > 1)
 {
-  byte negative_next_board_score;
+  int negative_next_board_score;
   
-  byte updated_extra_moves;
-  byte updated_N;
+  int updated_extra_moves;
+  int updated_N;
   for (int i=0; i<mvs.size(); i++)
   { 
     updated_extra_moves = extra_moves; // reset for every move
     updated_N = n_left; // reset for every move
-    byte[][] move = mvs.get(i);
+    int[][] move = mvs.get(i);
     // get updated coordinates for next recursive move call
-    ArrayList<ArrayList<byte[]>> updated_coords = operations.update_coords(my_coords, enemy_coords, move);
-    ArrayList<byte[]> upd_my_coords = updated_coords.get(0); 
-    ArrayList<byte[]> upd_enemy_coords = updated_coords.get(1); 
+    ArrayList<ArrayList<int[]>> updated_coords = operations.update_coords(my_coords, enemy_coords, move);
+    ArrayList<int[]> upd_my_coords = updated_coords.get(0); 
+    ArrayList<int[]> upd_enemy_coords = updated_coords.get(1); 
     char attacking_piece = board1[move[0][0]][move[0][1]][1];
     char attacked_piece = board1[move[1][0]][move[1][1]][1];
     if (attacking_piece == special_piece && extra_moves>0)
@@ -408,15 +408,15 @@ if (n_left > 1)
       updated_N += 1;
       updated_extra_moves -= 1;
     }
-    negative_next_board_score = (byte) (-current_board_score - 
-                piece_value(board1[move[1][0]][move[1][1]][1]));
+    negative_next_board_score = -current_board_score - 
+                piece_value(board1[move[1][0]][move[1][1]][1]);
     if (attacked_piece == 'k')
-      scores[i] = (byte) (100 + n_left);//127; // and don't go deeper
+      scores[i] = 100 + n_left;//127; // and don't go deeper
     else 
       scores[i] = get_min_or_max_enhanced(
       operations.execute_move(board1, move[0], move[1]), 
       new_move_color, 
-      (byte) (updated_N-1), 
+      updated_N-1, 
       new_wcs, 
       negative_next_board_score,
       special_piece,
@@ -438,11 +438,11 @@ else
 {
   for (int i=0; i<mvs.size(); i++)
   {
-    byte[][] move = mvs.get(i);
+    int[][] move = mvs.get(i);
     if (board1[move[1][0]][move[1][1]][1] == 'k')
-      scores[i] = (byte) (100 + n_left); // and don't go deeper
+      scores[i] = 100 + n_left; // and don't go deeper
     else 
-      scores[i] = (byte) (current_board_score + piece_value(board1[move[1][0]][move[1][1]][1]));
+      scores[i] = current_board_score + piece_value(board1[move[1][0]][move[1][1]][1]);
     if (scores[i] > -wcs)
       {
         break;
@@ -453,20 +453,20 @@ else
   
 }
 out = scores[operations.max_index(scores)];
-return (byte) (-out);
+return -out;
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 /**
-  private static byte[][] aggressive_ai(char[][][] board1, char color)
+  private static int[][] aggressive_ai(char[][][] board1, char color)
   {
    
-    ArrayList<byte[][]> mvs = moves_methods.get_moves(board1, color);
+    ArrayList<int[][]> mvs = moves_methods.get_moves(board1, color);
     //char[][][] board2 = new char[8][8][2];
-    byte[] scores = new byte[mvs.size()];
+    int[] scores = new int[mvs.size()];
     for (int i=0; i<mvs.size(); i++)
     {
-      byte[][] move = mvs.get(i);
+      int[][] move = mvs.get(i);
       scores[i] = board_score(operations.execute_move(board1,move[0], move[1]), color);
     }
     
@@ -475,14 +475,14 @@ return (byte) (-out);
   **/
   
 
-  private static byte board_score(char[][][] board, char color)
+  private static int board_score(char[][][] board, char color)
   {
-    byte out = 0;
-    byte val = 0;
+    int out = 0;
+    int val = 0;
     char pp;
-    for (byte i=0; i<8; i++)
+    for (int i=0; i<8; i++)
     {
-      for (byte j=0; j<8; j++)
+      for (int j=0; j<8; j++)
       {
         pp = board[i][j][1];
         if (pp!='0')
@@ -495,9 +495,9 @@ return (byte) (-out);
     }
     return out;
   }
-  private static byte piece_value(char piece)
+  private static int piece_value(char piece)
   {
-    byte out=0;
+    int out=0;
     switch (piece)
     {
       case 'p' : out=1; break;

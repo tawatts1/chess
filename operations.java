@@ -16,15 +16,15 @@ public class operations {
     public static final char[] WN = { 'w', 'n' };
     public static final char[] BR = { 'b', 'r' };
     public static final char[] WR = { 'w', 'r' };
-    public static char[][][] execute_move(char[][][] board, byte[] c1, byte[] c2)
+    public static char[][][] execute_move(char[][][] board, int[] c1, int[] c2)
     {
         char[][][] board1 = new char[8][8][2];
-        for (byte i=0; i<8; i++)
+        for (int i=0; i<8; i++)
         {
             if (c1[0] == i || c2[0] == i)
             {
             
-            for (byte j=0; j<8; j++)
+            for (int j=0; j<8; j++)
             {
                 if ((c1[0] == i && c1[1] == j) || (c2[0] == i && c2[1] == j))// if it's a hit
                 {
@@ -54,15 +54,15 @@ public class operations {
             board1[c2[0]][c2[1]] = WQ;
         return board1;
     }
-    public static ArrayList<ArrayList<byte[]>> update_coords(ArrayList<byte[]> my_coords, 
-                                                    ArrayList<byte[]> enemy_coords, 
-                                                    byte[][] move)
+    public static ArrayList<ArrayList<int[]>> update_coords(ArrayList<int[]> my_coords, 
+                                                    ArrayList<int[]> enemy_coords, 
+                                                    int[][] move)
   {
     //make copy:
-    ArrayList<ArrayList<byte[]>> out = new ArrayList<ArrayList<byte[]>>();//ArrayList[2];//{new ArrayList<byte[]>(my_coords)};
-    ArrayList<byte[]> out0 = new ArrayList<byte[]>(my_coords);
-    ArrayList<byte[]> out1 = new ArrayList<byte[]>(enemy_coords);
-    byte[] temp = {0,0};
+    ArrayList<ArrayList<int[]>> out = new ArrayList<ArrayList<int[]>>();//ArrayList[2];//{new ArrayList<int[]>(my_coords)};
+    ArrayList<int[]> out0 = new ArrayList<int[]>(my_coords);
+    ArrayList<int[]> out1 = new ArrayList<int[]>(enemy_coords);
+    int[] temp = {0,0};
     for (int i=0; i<my_coords.size(); i++)
     {
       temp = my_coords.get(i);
@@ -75,7 +75,7 @@ public class operations {
     out.add(out0); out.add(out1);
     return out;
   } 
-  private static void remove_if_contains(ArrayList<byte[]> arr, byte[] id)
+  private static void remove_if_contains(ArrayList<int[]> arr, int[] id)
   {
     for (int i=0; i<arr.size(); i++)
     {
@@ -87,9 +87,9 @@ public class operations {
     }
   } 
 
-  public static int max_index(byte[] arr)
+  public static int max_index(int[] arr)
   {
-    //byte out = 0;
+    //int out = 0;
     int max_i = 0;
     for (int i=0; i<arr.length; i++)
     {
@@ -108,12 +108,12 @@ public class operations {
     String[] rows = lst.split("=");
     char color;
     char name;
-    for (byte i=0; i<8; i++)
+    for (int i=0; i<8; i++)
     {
       //System.out.println(row);
       char[][] row_l = new char[8][2];
       String[] pieces = rows[i].split("_");
-      for (byte j=0; j<8; j++)
+      for (int j=0; j<8; j++)
       {
         color = pieces[j].charAt(0);
         if (color=='0')
@@ -152,33 +152,33 @@ public class operations {
     }
     return out;
   }
-  public static byte[] add_lists(byte[] l1, byte[] l2)
+  public static int[] add_lists(int[] l1, int[] l2)
   {
     int size = l1.length;
-    byte[] out = new byte[size];
+    int[] out = new int[size];
     for (int i=0; i<size; i++)
     {
-      out[i] = (byte) (l1[i] + l2[i]);
+      out[i] = l1[i] + l2[i];
     }
     return out;
   }
-  public static byte[] subtract_lists(byte[] l1, byte[] l2)
+  public static int[] subtract_lists(int[] l1, int[] l2)
   {
     int size = l1.length;
-    byte[] out = new byte[size];
+    int[] out = new int[size];
     for (int i=0; i<size; i++)
     {
-      out[i] = (byte) (l1[i] - l2[i]);
+      out[i] = l1[i] - l2[i];
     }
     return out;
   }
-  public static byte[] multiply_list(byte[] l1, byte alpha)
+  public static int[] multiply_list(int[] l1, int alpha)
   {
     int size = l1.length;
-    byte[] out = new byte[size];
+    int[] out = new int[size];
     for (int i=0; i<size; i++)
     {
-      out[i] = (byte) (l1[i] * alpha);
+      out[i] = l1[i] * alpha;
     }
     return out;
   }
