@@ -93,13 +93,7 @@ public static void main(String[] args) throws Exception {
       else System.out.println("STALEMATE");
     }
   }
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-/**
-private static byte[][] choose_aggresive_moves(ArrayList<byte[][]> moves)
-{
 
-}
-*/
 private static ArrayList<byte[][]> filter_illegal_moves(char[][][] board, ArrayList<byte[][]> moves)
 {
   ArrayList<byte[][]> out = new ArrayList<byte[][]>();
@@ -139,22 +133,41 @@ private static boolean in_check(char[][][] board, char color)
   return out;
 }
 
-private static ArrayList<byte[][]> prioritize_moves(char[][][] board, ArrayList<byte[][]> mvs0, char enemy_color)
-{
-  ArrayList<byte[][]> out = new ArrayList<byte[][]>(mvs0);
+private static void prioritize_moves(char[][][] board, ArrayList<byte[][]> mvs0, char enemy_color)
+{// attacks, direction?
+  // attack +10, 
+  //for bishop prioritize number of moves (13,11,9,7), 
+  //for knight, prioritize number of moves as well(8,...), 
+  //queen, number of moves 
+  //ArrayList<byte[][]> out = new ArrayList<byte[][]>(mvs0);
 
-  int j = 0;
-
+  
   byte[][] mv = new byte[2][2];
+  //int scalar;
+  //if (enemy_color == 'b') scalar = -1;
+  //else scalar = 1;
+
+  int j;
+  /** 
+  for (int i=0; i< mvs0.size(); i++)
+  {
+    mv = mvs0.get(i);
+    if ((mv[1][0]-mv[0][0])*scalar > 0 )
+    {
+      Collections.swap(mvs0, i, j++); // swap elements and increment j. 
+    }
+  }
+  */
+  j = 0;
   for (int i=0; i< mvs0.size(); i++)
   {
     mv = mvs0.get(i);
     if (board[mv[1][0]][mv[1][1]][0] == enemy_color)
     {
-      Collections.swap(out, i, j++); // swap elements and increment j. 
+      Collections.swap(mvs0, i, j++); // swap elements and increment j. 
     }
   }
-  return out;
+  //return out;
 }
 
 private static ArrayList<byte[][]> recursive_ai_enhanced(
@@ -185,7 +198,7 @@ private static ArrayList<byte[][]> recursive_ai_enhanced(
   }
 
   ArrayList<byte[][]> mvs = moves_methods.get_moves(board1, my_coords);
-  mvs = prioritize_moves(board1, mvs, new_move_color);
+  prioritize_moves(board1, mvs, new_move_color);
   byte[] scores = new byte[mvs.size()];
 
 
@@ -367,7 +380,7 @@ if (move_color=='w'){ new_move_color = 'b'; }
 else { new_move_color = 'w'; }
 //calculate moves using known coordinates to increase speed
 ArrayList<byte[][]> mvs = moves_methods.get_moves(board1, my_coords);
-mvs = prioritize_moves(board1, mvs, new_move_color);
+prioritize_moves(board1, mvs, new_move_color);
 
 byte[] scores = new byte[mvs.size()];
 byte new_wcs = -127; // start as the worst possible
