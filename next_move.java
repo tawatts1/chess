@@ -8,23 +8,12 @@ import java.util.Random;
 
 
 public class next_move {
-/**
- * public static class thread_score implements Callable<int> { char[][][]
- * board0; char color; int N;
- * 
- * public thread_score(char[][][] board0, char color, int N) { this.board0 =
- * board0; this.color = color; this.N = N; }
- * 
- * //@Override // not needed? public int call() throws Exception { return
- * get_min_or_max(board0, color, N); } }
- * 
- * @throws Exception
- **/
+
 
 public static void main(String[] args) throws Exception {
   //     board_string, color, N, legal, specialty, specialty_num, post_strategy
     char[][][] board = operations.construct_board(args[0]);
-    //print_board(board);
+    //operations.print_board(board);
     char clr = args[1].charAt(0);
     int N = Integer.parseInt(args[2]);
     boolean check = false;
@@ -148,16 +137,7 @@ private static void prioritize_moves(char[][][] board, ArrayList<int[][]> mvs0, 
   //else scalar = 1;
 
   int j;
-  /** 
-  for (int i=0; i< mvs0.size(); i++)
-  {
-    mv = mvs0.get(i);
-    if ((mv[1][0]-mv[0][0])*scalar > 0 )
-    {
-      Collections.swap(mvs0, i, j++); // swap elements and increment j. 
-    }
-  }
-  */
+  
   j = 0;
   for (int i=0; i< mvs0.size(); i++)
   {
@@ -203,8 +183,6 @@ private static ArrayList<int[][]> recursive_ai_enhanced(
 
 
   int wcs = -127; // start as the worst possible
-  int current_board_score = board_score(board1, color);
-  int negative_next_board_score;
   int updated_extra_moves;
   int updated_N;
   for (int i=0; i<mvs.size(); i++)
@@ -216,9 +194,6 @@ private static ArrayList<int[][]> recursive_ai_enhanced(
     updated_extra_moves = extra_moves; // reset for every move
     updated_N = N; // reset for every move
     char attacking_piece = board1[move[0][0]][move[0][1]][1];
-    char attacked_piece = board1[move[1][0]][move[1][1]][1]; 
-    negative_next_board_score = (int) (-current_board_score - 
-                              piece_value(attacked_piece));
     if (N>0)
     { 
       if (attacking_piece == special_piece && extra_moves>0)
@@ -234,7 +209,7 @@ private static ArrayList<int[][]> recursive_ai_enhanced(
         new_move_color, 
         updated_N, 
         wcs, 
-        negative_next_board_score,
+        //negative_next_board_score,
         special_piece,
         updated_extra_moves,
         upd_enemy_coords,
@@ -263,105 +238,12 @@ private static ArrayList<int[][]> recursive_ai_enhanced(
   }
   return out;
 }
-/**
-private static int get_min_or_max_enhanced(
-        char[][][] board1, 
-        char move_color,
-        int n_left,
-        int wcs,
-        int current_board_score,
-        char special_piece,
-        int extra_moves)
-  /** The idea is as follows: suppose white is thinking ahead and comes up with a
-   * move in which he can force a gain of 5 points. He is now considering his next
-   * possible move but discovers that if he does that black can then force that white
-   *  only gets 4 instead of 5 points. White should then abandon that move 
-   * and not even calculate the rest of the possibilities
-   * In each layer this is implemented it should save about half of the computations. 
-  
-  {
-    int out=0;
-    ArrayList<int[][]> mvs = moves_methods.get_moves(board1, move_color);
-    int new_wcs = -127; // start as the worst possible
-    if (mvs.size()>0)
-    {
-      if (n_left > 1)
-      {
-        int negative_next_board_score;
-        int[] scores = new int[mvs.size()];
-        char new_move_color;
-        if (move_color=='w'){ new_move_color = 'b'; }
-        else { new_move_color = 'w'; }
-        int updated_extra_moves;
-        int updated_N;
-        for (int i=0; i<mvs.size(); i++)
-        { 
-          updated_extra_moves = extra_moves; // reset for every move
-          updated_N = n_left; // reset for every move
-          int[][] move = mvs.get(i);
-          char attacking_piece = board1[move[0][0]][move[0][1]][1];
-          char attacked_piece = board1[move[1][0]][move[1][1]][1];
-          if (attacking_piece == special_piece && extra_moves>0)
-          { // if the piece you are attacking is your specialty, look further
-            updated_N += 1;
-            updated_extra_moves -= 1;
-          }
-          negative_next_board_score = (int) (-current_board_score + 
-                      piece_value(board1[move[1][0]][move[1][1]][1]));
-          if (attacked_piece == 'k')
-            scores[i] = (int) (100 + n_left);//127; // and don't go deeper
-          else 
-            scores[i] = get_min_or_max_enhanced(
-            operations.execute_move(board1, move[0], move[1]), 
-            new_move_color, 
-            (int) (updated_N-1), 
-            new_wcs, 
-            negative_next_board_score,
-            special_piece,
-            updated_extra_moves);
-          if (new_wcs < scores[i]) // if there's a better path,
-          {// there is a new worst case scenario
-            new_wcs = scores[i];
-          }
-          if (scores[i] > -wcs)
-          {
-            break;
-          }
-          //board_score(operations.execute_move(board1,move[0], move[1]), move_color);
-        }
-        out = scores[operations.max_index(scores)];
-        
-      }
-      else
-      {
-        int[] scores = new int[mvs.size()];
-        for (int i=0; i<mvs.size(); i++)
-        {
-          int[][] move = mvs.get(i);
-          if (board1[move[1][0]][move[1][1]][1] == 'k')
-            scores[i] = (int) (100 + n_left); // and don't go deeper
-          else 
-            scores[i] = (int) (-current_board_score + piece_value(board1[move[1][0]][move[1][1]][1]));
-          if (scores[i] > -wcs)
-            {
-              break;
-            }
-            
-        }
-        //System.out.println(scores[operations.max_index(scores)]);
-        out = scores[operations.max_index(scores)];
-      }
-    }
-    else {out=0;}
-    return (int) (-out);
-  }
-*/
+
   private static int get_min_or_max_enhanced(
     char[][][] board1, 
     char move_color,
     int n_left,
     int wcs,
-    int current_board_score,
     char special_piece,
     int extra_moves,
     ArrayList<int[]> my_coords,
@@ -388,8 +270,6 @@ int new_wcs = -127; // start as the worst possible
 
 if (n_left > 1)
 {
-  int negative_next_board_score;
-  
   int updated_extra_moves;
   int updated_N;
   for (int i=0; i<mvs.size(); i++)
@@ -408,8 +288,6 @@ if (n_left > 1)
       updated_N += 1;
       updated_extra_moves -= 1;
     }
-    negative_next_board_score = -current_board_score - 
-                piece_value(board1[move[1][0]][move[1][1]][1]);
     if (attacked_piece == 'k')
       scores[i] = 100 + n_left;//127; // and don't go deeper
     else 
@@ -418,12 +296,11 @@ if (n_left > 1)
       new_move_color, 
       updated_N-1, 
       new_wcs, 
-      negative_next_board_score,
       special_piece,
       updated_extra_moves,
       upd_enemy_coords,
       upd_my_coords);
-    if (new_wcs < scores[i]) // if there's a better path,
+    if (scores[i] > new_wcs) // if there's a better path,
     {// there is a new worst case scenario
       new_wcs = scores[i];
     }
@@ -431,10 +308,9 @@ if (n_left > 1)
     {
       break;
     }
-    //board_score(operations.execute_move(board1,move[0], move[1]), move_color);
   }
 }
-else
+else // if n_left <= 1:
 {
   for (int i=0; i<mvs.size(); i++)
   {
@@ -442,38 +318,19 @@ else
     if (board1[move[1][0]][move[1][1]][1] == 'k')
       scores[i] = 100 + n_left; // and don't go deeper
     else 
-      scores[i] = current_board_score + piece_value(board1[move[1][0]][move[1][1]][1]);
+      scores[i] = board_score(operations.execute_move(board1, move[0], move[1]),
+       move_color);//current_board_score + piece_value(board1[move[1][0]][move[1][1]][1]);
     if (scores[i] > -wcs)
       {
         break;
       }
       
   }
-  //System.out.println(scores[operations.max_index(scores)]);
   
 }
 out = scores[operations.max_index(scores)];
 return -out;
 }
-
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-/**
-  private static int[][] aggressive_ai(char[][][] board1, char color)
-  {
-   
-    ArrayList<int[][]> mvs = moves_methods.get_moves(board1, color);
-    //char[][][] board2 = new char[8][8][2];
-    int[] scores = new int[mvs.size()];
-    for (int i=0; i<mvs.size(); i++)
-    {
-      int[][] move = mvs.get(i);
-      scores[i] = board_score(operations.execute_move(board1,move[0], move[1]), color);
-    }
-    
-    return mvs.get(operations.max_index(scores));
-  }
-  **/
-  
 
   private static int board_score(char[][][] board, char color)
   {
