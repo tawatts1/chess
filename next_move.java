@@ -182,7 +182,7 @@ private static ArrayList<int[][]> recursive_ai_enhanced(
   int[] scores = new int[mvs.size()];
 
 
-  int wcs = -127; // start as the worst possible
+  int wcs = -10000; // start as the worst possible
   int updated_extra_moves;
   int updated_N;
   for (int i=0; i<mvs.size(); i++)
@@ -265,7 +265,7 @@ ArrayList<int[][]> mvs = moves_methods.get_moves(board1, my_coords);
 prioritize_moves(board1, mvs, new_move_color);
 
 int[] scores = new int[mvs.size()];
-int new_wcs = -127; // start as the worst possible
+int new_wcs = -10000; // start as the worst possible
 
 
 if (n_left > 1)
@@ -289,7 +289,7 @@ if (n_left > 1)
       updated_extra_moves -= 1;
     }
     if (attacked_piece == 'k')
-      scores[i] = 100 + n_left;//127; // and don't go deeper
+      scores[i] = 9000 + n_left; // and don't go deeper
     else 
       scores[i] = get_min_or_max_enhanced(
       operations.execute_move(board1, move[0], move[1]), 
@@ -316,10 +316,10 @@ else // if n_left <= 1:
   {
     int[][] move = mvs.get(i);
     if (board1[move[1][0]][move[1][1]][1] == 'k')
-      scores[i] = 100 + n_left; // and don't go deeper
+      scores[i] = 9000 + n_left; // and don't go deeper
     else 
       scores[i] = board_score(operations.execute_move(board1, move[0], move[1]),
-       move_color);//current_board_score + piece_value(board1[move[1][0]][move[1][1]][1]);
+       move_color);
     if (scores[i] > -wcs)
       {
         break;
@@ -344,7 +344,7 @@ return -out;
         pp = board[i][j][1];
         if (pp!='0')
         {
-          val = piece_value(pp);
+          val = piece_value(pp)+position_value(pp,i,j);
           if (color==board[i][j][0]){out+=val;}
           else {out-=val;}
         }
@@ -352,17 +352,63 @@ return -out;
     }
     return out;
   }
+  private static int position_value(char piece, int i, int j)
+  {
+    int out = 0;
+    switch (piece)
+    {
+      //case 'p' : out=100; break; no pawn handling
+      case 'r' : 
+      case 'q' : out = 14;
+        if (piece == 'r') break;
+      case 'b' : 
+        if      (any_equal(0,7,i,j)) out = 7;
+        else if (any_equal(1,6,i,j)) out = 9;
+        else if (any_equal(2,5,i,j)) out = 11;
+        else out = 13;
+        break;
+      case 'n' : 
+        if (any_equal(0,7,i,j)) 
+          if (all_equal_to_something(0, 7, i, j)) 
+            out = 2;
+          else if (any_equal(1, 6, i, j))
+            out = 3;
+          else
+            out = 4;
+        else if (any_equal(1, 6, i, j))
+          if (all_equal_to_something(1, 6, i, j))
+            out = 4;
+          else out = 6;
+        else out = 8;
+        break;
+      default  : break;
+    }
+    return out;
+  }
+  private static boolean any_equal(int val1, int val2, int i, int j)
+  {
+    
+    if (val1 == i || val2 == i || val1 == j || val2 == j) 
+      return true;
+    else return false;
+  }
+  private static boolean all_equal_to_something(int val1, int val2, int i, int j)
+  {
+    
+    if ((i == val1 || i == val2) && (j==val1 || j==val2))
+      return true;
+    else return false;
+  }
   private static int piece_value(char piece)
   {
     int out=0;
     switch (piece)
     {
-      case 'p' : out=1; break;
+      case 'p' : out=100; break;
       case 'b' : 
-      case 'n' : out = 3; break;
-      case 'r' : out = 5; break;
-      case 'q' : out = 9; break;
-      //case 'k' : out =0; break;
+      case 'n' : out = 300; break;
+      case 'r' : out = 500; break;
+      case 'q' : out = 900; break;
       default  : break;
     }
     return out;
