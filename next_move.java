@@ -38,7 +38,7 @@ public static void main(String[] args) throws Exception {
     
 
     
-    ArrayList<int[][]> mvs = recursive_ai_enhanced(board, clr, N, extra_moves_ ,specialty_piece);
+    ArrayList<int[][]> mvs = recursive_score_w_position(board, clr, N, extra_moves_ ,specialty_piece);
     if (legal) // don't allow illegal moves: 
       mvs = filter_illegal_moves(board, mvs); 
     
@@ -150,7 +150,7 @@ private static void prioritize_moves(char[][][] board, ArrayList<int[][]> mvs0, 
   //return out;
 }
 
-private static ArrayList<int[][]> recursive_ai_enhanced(
+private static ArrayList<int[][]> recursive_score_w_position(
   char[][][] board1, 
   char color, 
   int N,
@@ -204,12 +204,12 @@ private static ArrayList<int[][]> recursive_ai_enhanced(
       //ArrayList<int[]> upd_my_coords = new ArrayList<int[]>(my_coords);
       //ArrayList<int[]> upd_enemy_coords = new ArrayList<int[]>(enemy_coords);
       char[][][] board2 = operations.execute_move(board1, move[0], move[1]);        
-      scores[i] = get_min_or_max_enhanced(
+      scores[i] = minmax_position(
         board2, 
         new_move_color, 
         updated_N, 
         wcs, 
-        //negative_next_board_score,
+        //negative_next_board_score_position,
         special_piece,
         updated_extra_moves,
         upd_enemy_coords,
@@ -221,7 +221,7 @@ private static ArrayList<int[][]> recursive_ai_enhanced(
   
     }
     else // if N = 0; almost never used, unless you want a super dumb ai. 
-      scores[i] = board_score(operations.execute_move(board1, move[0],move[1]), color);
+      scores[i] = board_score_position(operations.execute_move(board1, move[0],move[1]), color);
     if (scores[i] > wcs)
     {
       wcs = scores[i];
@@ -239,7 +239,7 @@ private static ArrayList<int[][]> recursive_ai_enhanced(
   return out;
 }
 
-  private static int get_min_or_max_enhanced(
+  private static int minmax_position(
     char[][][] board1, 
     char move_color,
     int n_left,
@@ -291,7 +291,7 @@ if (n_left > 1)
     if (attacked_piece == 'k')
       scores[i] = 9000 + n_left; // and don't go deeper
     else 
-      scores[i] = get_min_or_max_enhanced(
+      scores[i] = minmax_position(
       operations.execute_move(board1, move[0], move[1]), 
       new_move_color, 
       updated_N-1, 
@@ -318,7 +318,7 @@ else // if n_left <= 1:
     if (board1[move[1][0]][move[1][1]][1] == 'k')
       scores[i] = 9000 + n_left; // and don't go deeper
     else 
-      scores[i] = board_score(operations.execute_move(board1, move[0], move[1]),
+      scores[i] = board_score_position(operations.execute_move(board1, move[0], move[1]),
        move_color);
     if (scores[i] > -wcs)
       {
@@ -332,7 +332,7 @@ out = scores[operations.max_index(scores)];
 return -out;
 }
 
-  private static int board_score(char[][][] board, char color)
+  private static int board_score_position(char[][][] board, char color)
   {
     int out = 0;
     int val = 0;
