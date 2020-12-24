@@ -18,7 +18,48 @@ public class moves_methods
       System.out.println(mv[1][0] + ", " + mv[1][1]);
 
   }
-    public static ArrayList<int[][]> get_moves(char[][][] board, ArrayList<int[]> coords)
+
+  public static ArrayList<int[][]> filter_illegal_moves(char[][][] board, ArrayList<int[][]> moves)
+  {
+    ArrayList<int[][]> out = new ArrayList<int[][]>();
+    char color = board[moves.get(0)[0][0]][moves.get(0)[0][1]][0];
+    for (int[][] mv0 : moves)
+      if (false==in_check(operations.execute_move(board, mv0[0], mv0[1]), color))
+        out.add(mv0);
+    return out;
+  }
+
+  public static boolean in_check(char[][][] board, char color)
+  {
+    boolean out = false;
+    char other_color;
+    if (color=='b') other_color = 'w';
+    else if (color == 'w') other_color = 'b';
+    else return true;
+    int[] king_coords = new int[2];
+    for (int i=0; i<8; i++)
+    {
+      for (int j=0; j<8; j++)
+      {
+        if (board[i][j][0] == color && board[i][j][1] == 'k')
+        {
+          king_coords[0] = i; king_coords[1] = j;
+        }
+      }
+    }
+    ArrayList<int[][]> mvs = get_moves(board, other_color);
+    for (int[][] mv : mvs)
+    {
+      if (mv[1][0] == king_coords[0] && mv[1][1] == king_coords[1])
+      {
+        out = true;
+        break;
+      }
+    }
+    return out;
+  }
+
+  public static ArrayList<int[][]> get_moves(char[][][] board, ArrayList<int[]> coords)
   {
     ArrayList<int[][]> out = new ArrayList<int[][]>();
     char piece;// = board[coord[0]][coord[1]][1];
