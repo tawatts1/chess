@@ -64,10 +64,10 @@ br_bn_00_00_bk_00_bn_00=00_bb_00_00_bp_00_wr_00=00_00_00_00_00_00_00_00=bq_00_bp
 
 '''
 #print(string)
-for string in [string1, string2, string3, string4]:
+for string in [string1, string2, string3, string4, string5, string6, string7, string8]:
     t0 = time.time()
     move =  subprocess.run(
-                        ['java',file, string,'b','4', 'list_all', 'knight', '0'],
+                        ['java',file, string,'b','5', 'list_all', 'knight', '0', 'pos'],
                         check=True, 
                         stdout=subprocess.PIPE).stdout.decode('ascii')
     print(move[:-1])
@@ -75,3 +75,21 @@ for string in [string1, string2, string3, string4]:
     print(len(move))
     print('time: ', time.time()-t0)
     print()
+
+
+'''
+on dec 19, after implementing a rudimentary prioritization approach, for N=5:
+40
+5.2
+7.5
+5.7
+accurate to about 10% or so. 
+
+
+
+dec 24, scoring with position, N=5:
+12
+17
+23
+10
+'''
