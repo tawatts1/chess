@@ -2,7 +2,25 @@ import java.util.ArrayList;
 
 public class ai_piece_val_pos 
 {
+    public static void main(String[] args)
+    {
+        char[][][] board = new char[8][8][2];
+        for (int i=0; i<8; i++) for (int j=0; j<8; j++)
+        {
+            board[i][j][0] = '0'; board[i][j][1] = '0';
+        }
+        board[0][0][0] = 'b'; board[0][0][1] = 'k';
+        //board[0][4][0] = 'b'; board[0][4][1] = 'n';
+        board[1][4][0] = 'b'; board[1][4][1] = 'n';
+        
+        board[7][5][0] = 'w'; board[7][5][1] = 'k';
+        board[7][4][0] = 'w'; board[7][4][1] = 'n';
+        board[6][4][0] = 'w'; board[6][4][1] = 'n';
 
+        operations.print_board(board);
+
+        recursive_score_w_position(board, 'b', 3, 0, 'p');
+    }
     public static ArrayList<int[][]> recursive_score_w_position(
         char[][][] board1, 
         char color, 
@@ -34,7 +52,8 @@ public class ai_piece_val_pos
         ai_util.prioritize_moves(board1, mvs, new_move_color);
         int[] scores = new int[mvs.size()];
 
-
+        int negative_next_board_score;
+        int current_board_score = board_score_position(board1, color);
         int wcs = -10000; // start as the worst possible
         int updated_extra_moves;
         int updated_N;
@@ -47,6 +66,11 @@ public class ai_piece_val_pos
             updated_extra_moves = extra_moves; // reset for every move
             updated_N = N; // reset for every move
             char attacking_piece = board1[move[0][0]][move[0][1]][1];
+            char attacked_piece = board1[move[1][0]][move[1][1]][1]; 
+            negative_next_board_score = -(current_board_score + 
+                    position_difference(attacking_piece, move) +
+                    position_value(attacked_piece, move[1][0], move[1][1]) +
+                    ai_util.piece_value(attacked_piece) );
             if (N>0)
             { 
                 if (attacking_piece == special_piece && extra_moves>0)
@@ -62,7 +86,7 @@ public class ai_piece_val_pos
                 new_move_color, 
                 updated_N, 
                 wcs, 
-                //negative_next_board_score_position,
+                negative_next_board_score,
                 special_piece,
                 updated_extra_moves,
                 upd_enemy_coords,
@@ -97,17 +121,11 @@ public class ai_piece_val_pos
         char move_color,
         int n_left,
         int wcs,
+        int current_board_score,
         char special_piece,
         int extra_moves,
         ArrayList<int[]> my_coords,
         ArrayList<int[]> enemy_coords)
-        /** The idea is as follows: suppose white is thinking ahead and comes up with a
-        * move in which he can force a gain of 5 points. He is now considering his next
-        * possible move but discovers that if he does that black can then force that white
-        *  only gets 4 instead of 5 points. White should then abandon that move 
-        * and not even calculate the rest of the possibilities
-        * In each layer this is implemented it should save about half of the computations. 
-        */  
     {
         int out=0;
         char new_move_color;
@@ -116,13 +134,14 @@ public class ai_piece_val_pos
         //calculate moves using known coordinates to increase speed
         ArrayList<int[][]> mvs = moves_methods.get_moves(board1, my_coords);
         ai_util.prioritize_moves(board1, mvs, new_move_color);
-
+        
         int[] scores = new int[mvs.size()];
         int new_wcs = -10000; // start as the worst possible
 
 
         if (n_left > 1)
         {
+            int negative_next_board_score;
             int updated_extra_moves;
             int updated_N;
             for (int i=0; i<mvs.size(); i++)
@@ -141,6 +160,10 @@ public class ai_piece_val_pos
                     updated_N += 1;
                     updated_extra_moves -= 1;
                 }
+                negative_next_board_score = -(current_board_score + 
+                    position_difference(attacking_piece, move) +
+                    position_value(attacked_piece, move[1][0], move[1][1]) +
+                    ai_util.piece_value(attacked_piece) );
                 if (attacked_piece == 'k')
                     scores[i] = 9000 + n_left; // and don't go deeper
                 else 
@@ -149,6 +172,7 @@ public class ai_piece_val_pos
                         new_move_color, 
                         updated_N-1, 
                         new_wcs, 
+                        negative_next_board_score,
                         special_piece,
                         updated_extra_moves,
                         upd_enemy_coords,
@@ -168,11 +192,16 @@ public class ai_piece_val_pos
             for (int i=0; i<mvs.size(); i++)
             {
                 int[][] move = mvs.get(i);
+                char attacking_piece = board1[move[0][0]][move[0][1]][1];
+                char attacked_piece = board1[move[1][0]][move[1][1]][1];
                 if (board1[move[1][0]][move[1][1]][1] == 'k')
-                scores[i] = 9000 + n_left; // and don't go deeper
+                    scores[i] = 9000 + n_left; // and don't go deeper
                 else 
-                    scores[i] = board_score_position(operations.execute_move(board1, move[0], move[1]),
-                                     move_color);
+                    scores[i] = current_board_score + 
+                    position_difference(attacking_piece, move) +
+                    position_value(attacked_piece, move[1][0], move[1][1]) +
+                    ai_util.piece_value(attacked_piece) ;
+                    //board_score_position(operations.execute_move(board1, move[0], move[1]),move_color);
                 if (scores[i] > -wcs)
                 {
                     break;
@@ -204,6 +233,11 @@ public class ai_piece_val_pos
             }
         }
         return out;
+    }
+
+    private static int position_difference(char piece, int[][] move)
+    {
+        return position_value(piece, move[1][0], move[1][1]) - position_value(piece, move[0][0], move[0][1]);
     }
 
     private static int position_value(char piece, int i, int j)
@@ -255,4 +289,43 @@ public class ai_piece_val_pos
     }
 
     
+/** 
+0,2,1,1
+8
+time:  10.867811679840088
+
+1,6,2,6
+1,7,0,7
+0,0,0,1
+1,0,2,0
+2,7,3,7
+1,3,2,3
+48
+time:  15.911284446716309
+
+3,6,4,6
+8
+time:  20.621116399765015
+
+3,6,2,5
+8
+time:  9.01906967163086
+
+0,3,1,4
+8
+time:  2.1189255714416504
+
+2,4,6,0
+8
+time:  5.786677122116089
+
+0,4,0,5
+8
+time:  3.8329715728759766
+
+1,3,2,3
+8
+time:  25.0583176612854
+ */
+
 }
