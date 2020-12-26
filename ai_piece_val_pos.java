@@ -47,13 +47,15 @@ public class ai_piece_val_pos
                 enemy_coords.add(coord);
             }
         }
-
+        int current_board_score = board_score_position(board1, color);
         ArrayList<int[][]> mvs = moves_methods.get_moves(board1, my_coords);
-        ai_util.prioritize_moves(board1, mvs, new_move_color);
+        //calculate scores and sort moves
+        ArrayList<Integer> next_board_scores = sort_moves(board1,current_board_score, mvs);
+        //ai_util.prioritize_moves(board1, mvs, new_move_color);
         int[] scores = new int[mvs.size()];
 
         int negative_next_board_score;
-        int current_board_score = board_score_position(board1, color);
+        
         int wcs = -10000; // start as the worst possible
         int updated_extra_moves;
         int updated_N;
@@ -66,11 +68,7 @@ public class ai_piece_val_pos
             updated_extra_moves = extra_moves; // reset for every move
             updated_N = N; // reset for every move
             char attacking_piece = board1[move[0][0]][move[0][1]][1];
-            char attacked_piece = board1[move[1][0]][move[1][1]][1]; 
-            negative_next_board_score = -(current_board_score + 
-                    position_difference(attacking_piece, move) +
-                    position_value(attacked_piece, move[1][0], move[1][1]) +
-                    ai_util.piece_value(attacked_piece) );
+            negative_next_board_score = -next_board_scores.get(i);
             if (N>0)
             { 
                 if (attacking_piece == special_piece && extra_moves>0)
@@ -133,7 +131,6 @@ public class ai_piece_val_pos
         else { new_move_color = 'w'; }
         //calculate moves using known coordinates to increase speed
         ArrayList<int[][]> mvs = moves_methods.get_moves(board1, my_coords);
-        ai_util.prioritize_moves(board1, mvs, new_move_color);
         
         int[] scores = new int[mvs.size()];
         int new_wcs = -10000; // start as the worst possible
@@ -144,6 +141,10 @@ public class ai_piece_val_pos
             int negative_next_board_score;
             int updated_extra_moves;
             int updated_N;
+            //sort moves and make board-scores list:
+            ai_util.prioritize_moves(board1, mvs, new_move_color);
+            ArrayList<Integer> next_board_scores = sort_moves(board1,current_board_score, mvs);
+
             for (int i=0; i<mvs.size(); i++)
             { 
                 updated_extra_moves = extra_moves; // reset for every move
@@ -160,10 +161,7 @@ public class ai_piece_val_pos
                     updated_N += 1;
                     updated_extra_moves -= 1;
                 }
-                negative_next_board_score = -(current_board_score + 
-                    position_difference(attacking_piece, move) +
-                    position_value(attacked_piece, move[1][0], move[1][1]) +
-                    ai_util.piece_value(attacked_piece) );
+                negative_next_board_score = - next_board_scores.get(i);
                 if (attacked_piece == 'k')
                     scores[i] = 9000 + n_left; // and don't go deeper
                 else 
@@ -287,12 +285,57 @@ public class ai_piece_val_pos
             return true;
         else return false;
     }
+    public static ArrayList<Integer> sort_moves(char[][][] board, int score0, ArrayList<int[][]> mvs)
+    {
+        ArrayList<Integer> scores = new ArrayList<>();
+        int[][] move = new int[2][2];
 
+        //write first score in score array
+        move = mvs.get(0);
+        char attacking_piece = board[move[0][0]][move[0][1]][1];
+        char attacked_piece = board[move[1][0]][move[1][1]][1];
+        int score = score0 + 
+            position_difference(attacking_piece, move) +
+            position_value(attacked_piece, move[1][0], move[1][1]) +
+            ai_util.piece_value(attacked_piece) ;
+        scores.add(score);
+        
+        //sort mvs and write rest of scores:
+        for (int i=1; i<mvs.size(); i++)
+        {
+            //get score
+            move = mvs.remove(i);
+            attacking_piece = board[move[0][0]][move[0][1]][1];
+            attacked_piece = board[move[1][0]][move[1][1]][1];
+            score = score0 + 
+                position_difference(attacking_piece, move) +
+                position_value(attacked_piece, move[1][0], move[1][1]) +
+                ai_util.piece_value(attacked_piece) ;
+            // do sorting things:
+            for (int j=i-1; j>=0; j--)
+            {
+                if (score <= scores.get(j)) // sort in descending order.
+                {
+                    mvs.add(j+1, move);
+                    scores.add(j+1, score);
+                    break;
+                }
+                else if (j==0) // if score is the biggest yet seen, put it first
+                {
+                    mvs.add(0, move);
+                    scores.add(0, score);
+                    break;
+                }
+            }
+        }
+        return scores;
+    }
     
 /** 
+
 0,2,1,1
 8
-time:  10.867811679840088
+time:  3.4400429725646973
 
 1,6,2,6
 1,7,0,7
@@ -301,31 +344,34 @@ time:  10.867811679840088
 2,7,3,7
 1,3,2,3
 48
-time:  15.911284446716309
+time:  2.604520797729492
 
 3,6,4,6
 8
-time:  20.621116399765015
+time:  4.012020587921143
 
 3,6,2,5
 8
-time:  9.01906967163086
+time:  2.593916654586792
 
 0,3,1,4
 8
-time:  2.1189255714416504
+time:  0.8541738986968994
 
 2,4,6,0
 8
-time:  5.786677122116089
+time:  2.831343173980713
 
 0,4,0,5
 8
-time:  3.8329715728759766
+time:  0.8403105735778809
 
 1,3,2,3
 8
-time:  25.0583176612854
+time:  4.933335781097412
+
+
+
  */
 
 }
