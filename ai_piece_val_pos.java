@@ -1,10 +1,13 @@
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class ai_piece_val_pos 
 {
     public static void main(String[] args)
     {
-        char[][][] board = new char[8][8][2];
+        char[][][] board = operations.construct_board("00_00_00_00_br_bk_00_br=bn_00_bp_00_00_bp_bp_00=bp_00_00_bp_bb_00_bq_bp=00_bp_00_00_bp_bn_00_00=wp_wp_00_00_00_00_wp_00=00_00_00_00_00_wp_wk_00=wr_wq_wp_wp_wp_00_wb_wp=wb_wn_00_00_00_00_00_wr");
+        //char[][][] board = new char[8][8][2];
+        /*
         for (int i=0; i<8; i++) for (int j=0; j<8; j++)
         {
             board[i][j][0] = '0'; board[i][j][1] = '0';
@@ -16,10 +19,11 @@ public class ai_piece_val_pos
         board[7][5][0] = 'w'; board[7][5][1] = 'k';
         board[7][4][0] = 'w'; board[7][4][1] = 'n';
         board[6][4][0] = 'w'; board[6][4][1] = 'n';
-
+        */
         operations.print_board(board);
-
-        recursive_score_w_position(board, 'b', 3, 0, 'p');
+        long t0 = System.currentTimeMillis();
+        recursive_score_w_position(board, 'b', 5, 0, 'p');
+        System.out.println((System.currentTimeMillis() - t0)/1000.0);
     }
     public static ArrayList<int[][]> recursive_score_w_position(
         char[][][] board1, 
@@ -142,7 +146,7 @@ public class ai_piece_val_pos
             int updated_extra_moves;
             int updated_N;
             //sort moves and make board-scores list:
-            ai_util.prioritize_moves(board1, mvs, new_move_color);
+            //ai_util.prioritize_moves(board1, mvs, new_move_color);
             ArrayList<Integer> next_board_scores = sort_moves(board1,current_board_score, mvs);
 
             for (int i=0; i<mvs.size(); i++)
@@ -288,49 +292,74 @@ public class ai_piece_val_pos
     public static ArrayList<Integer> sort_moves(char[][][] board, int score0, ArrayList<int[][]> mvs)
     {
         ArrayList<Integer> scores = new ArrayList<>();
+        int[][] move0 = mvs.remove(0);
         int[][] move = new int[2][2];
-
-        //write first score in score array
-        move = mvs.get(0);
-        char attacking_piece = board[move[0][0]][move[0][1]][1];
-        char attacked_piece = board[move[1][0]][move[1][1]][1];
-        int score = score0 + 
-            position_difference(attacking_piece, move) +
-            position_value(attacked_piece, move[1][0], move[1][1]) +
+        char attacking_piece = board[move0[0][0]][move0[0][1]][1];
+        char attacked_piece = board[move0[1][0]][move0[1][1]][1];
+        int p_index = 0;
+        int score;
+        int pivot = score0 + 
+            position_difference(attacking_piece, move0) +
+            position_value(attacked_piece, move0[1][0], move0[1][1]) +
             ai_util.piece_value(attacked_piece) ;
-        scores.add(score);
-        
-        //sort mvs and write rest of scores:
-        for (int i=1; i<mvs.size(); i++)
+        //write scores
+        for (int i=0; i<mvs.size(); i++)
         {
             //get score
             move = mvs.remove(i);
             attacking_piece = board[move[0][0]][move[0][1]][1];
             attacked_piece = board[move[1][0]][move[1][1]][1];
             score = score0 + 
-                position_difference(attacking_piece, move) +
-                position_value(attacked_piece, move[1][0], move[1][1]) +
-                ai_util.piece_value(attacked_piece) ;
-            // do sorting things:
-            for (int j=i-1; j>=0; j--)
+                        position_difference(attacking_piece, move) +
+                        position_value(attacked_piece, move[1][0], move[1][1]) +
+                        ai_util.piece_value(attacked_piece) ;
+            if (score > pivot)
             {
-                if (score <= scores.get(j)) // sort in descending order.
-                {
-                    mvs.add(j+1, move);
-                    scores.add(j+1, score);
-                    break;
-                }
-                else if (j==0) // if score is the biggest yet seen, put it first
-                {
-                    mvs.add(0, move);
-                    scores.add(0, score);
-                    break;
-                }
+                scores.add(p_index, score);
+                mvs.add(p_index, move);
+                p_index++;
+
+            }
+            else 
+            {
+                scores.add(score);
+                mvs.add(i, move);
             }
         }
+        scores.add(p_index, pivot);
+        mvs.add(p_index, move0);
+        int len = scores.size();
+        qsort(mvs, scores, 0, p_index-1);
+        qsort(mvs, scores, p_index+1, len-1);
         return scores;
     }
-    
+    private static void qsort(ArrayList<int[][]> mvs, ArrayList<Integer> scores, int start, int end)
+    {
+        if (start < end)
+        {
+            int p_index = partition(mvs, scores, start, end);
+            qsort(mvs, scores, start, p_index-1);
+            qsort(mvs, scores, p_index+1, end);
+        }
+    }
+    private static int partition(ArrayList<int[][]> mvs, ArrayList<Integer> scores, int start, int end)
+    {
+        int pivot = scores.get(end);
+        int p_index = start;
+        for (int i=start; i < end; i++)
+        {
+            if (scores.get(i)>= pivot)
+            {
+                Collections.swap(scores, i, p_index);
+                Collections.swap(mvs, i, p_index);
+                p_index++;
+            }
+        }
+        Collections.swap(scores, p_index, end);
+        Collections.swap(mvs, p_index, end);
+
+        return p_index;
+    }
 /** 
 
 0,2,1,1
