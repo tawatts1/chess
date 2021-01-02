@@ -278,74 +278,82 @@ public class ai_piece_val_pos
     public static ArrayList<Integer> sort_moves(char[][][] board, int score0, ArrayList<int[][]> mvs)
     {
         ArrayList<Integer> scores = new ArrayList<>();
-        int[][] move0 = mvs.remove(0);
         int[][] move = new int[2][2];
-        char attacking_piece = board[move0[0][0]][move0[0][1]][1];
-        char attacked_piece = board[move0[1][0]][move0[1][1]][1];
-        int p_index = 0;
+        char attacking_piece;
+        char attacked_piece;
         int score;
-        int pivot = score0 + 
-            position_difference(attacking_piece, move0) +
-            position_value(attacked_piece, move0[1][0], move0[1][1]) +
-            ai_util.piece_value(attacked_piece) ;
         //write scores
         for (int i=0; i<mvs.size(); i++)
         {
             //get score
-            move = mvs.remove(i);
+            move = mvs.get(i);
             attacking_piece = board[move[0][0]][move[0][1]][1];
             attacked_piece = board[move[1][0]][move[1][1]][1];
             score = score0 + 
                         position_difference(attacking_piece, move) +
                         position_value(attacked_piece, move[1][0], move[1][1]) +
                         ai_util.piece_value(attacked_piece) ;
-            if (score > pivot)
+            scores.add(score);
+        }
+        qsort(mvs, scores, 0, scores.size() - 1);
+        //if (false == verify_sort(scores))
+        //    System.out.println("Not sorted");
+        return scores;
+    }
+    private static boolean verify_sort(ArrayList<Integer> scores)
+    {
+        boolean out = true;
+        for (int i=0; i<scores.size() - 1; i++)
+        {
+            if (scores.get(i)<scores.get(i+1))
             {
-                scores.add(p_index, score);
-                mvs.add(p_index, move);
-                p_index++;
-
-            }
-            else 
-            {
-                scores.add(score);
-                mvs.add(i, move);
+                out = false;
+                break;
             }
         }
-        scores.add(p_index, pivot);
-        mvs.add(p_index, move0);
-        int len = scores.size();
-        qsort(mvs, scores, 0, p_index-1);
-        qsort(mvs, scores, p_index+1, len-1);
-        return scores;
+        return out;
     }
     
     private static void qsort(ArrayList<int[][]> mvs, ArrayList<Integer> scores, int start, int end)
     {
         if (start < end)
         {
-            int p_index = partition(mvs, scores, start, end);
-            qsort(mvs, scores, start, p_index-1);
-            qsort(mvs, scores, p_index+1, end);
+            int[] p_index = partition(mvs, scores, start, end);
+            qsort(mvs, scores, start, p_index[0]-1);
+            qsort(mvs, scores, p_index[1]+1, end);
         }
     }
-    private static int partition(ArrayList<int[][]> mvs, ArrayList<Integer> scores, int start, int end)
+    private static void move_to(ArrayList<int[][]> mvs, ArrayList<Integer> scores, int i0, int i_f)
+    {
+        mvs.add(i_f, mvs.remove(i0));
+        scores.add(i_f, scores.remove(i0));
+    }
+    private static int[] partition(ArrayList<int[][]> mvs, ArrayList<Integer> scores, int start, int end)
     {
         int pivot = scores.get(end);
         int p_index = start;
+        int duds = 0;
+        //int score;
         for (int i=start; i < end; i++)
         {
-            if (scores.get(i)>= pivot)
+            if (scores.get(i)> pivot)// most new scores are greater than the previous if not equal. 
             {
-                Collections.swap(scores, i, p_index);
-                Collections.swap(mvs, i, p_index);
+                //Collections.swap(scores, i, p_index);
+                //Collections.swap(mvs, i, p_index);
+                move_to(mvs,scores, i, start);//p_index);
                 p_index++;
             }
+            else if (scores.get(i) == pivot)
+            {
+                move_to(mvs, scores, i, p_index);
+                duds++;
+            }
         }
-        Collections.swap(scores, p_index, end);
-        Collections.swap(mvs, p_index, end);
-
-        return p_index;
+        move_to(mvs, scores, end, p_index);
+        //Collections.swap(scores, p_index, end);
+        //Collections.swap(mvs, p_index, end);
+        int[] out = {p_index, p_index + duds};
+        return  out;
     }
 
 }
