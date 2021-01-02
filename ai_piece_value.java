@@ -151,18 +151,18 @@ public class ai_piece_value {
                 negative_next_board_score = -current_board_score - 
                 ai_util.piece_value(board1[move[1][0]][move[1][1]][1]);
                 if (attacked_piece == 'k')
-                scores[i] = 100 + n_left;//127; // and don't go deeper
+                    scores[i] = 100 + n_left;//127; // and don't go deeper
                 else 
-                scores[i] = minmax_enhanced(
-                operations.execute_move(board1, move[0], move[1]), 
-                new_move_color, 
-                updated_N-1, 
-                new_wcs, 
-                negative_next_board_score,
-                special_piece,
-                updated_extra_moves,
-                upd_enemy_coords,
-                upd_my_coords);
+                    scores[i] = minmax_enhanced(
+                        operations.execute_move(board1, move[0], move[1]), 
+                        new_move_color, 
+                        updated_N-1, 
+                        new_wcs, 
+                        negative_next_board_score,
+                        special_piece,
+                        updated_extra_moves,
+                        upd_enemy_coords,
+                        upd_my_coords);
                 if (new_wcs < scores[i]) // if there's a better path,
                 {// there is a new worst case scenario
                     new_wcs = scores[i];
