@@ -5,7 +5,9 @@ public class ai_piece_val_pos
 {
     public static void main(String[] args)
     {
-        char[][][] board = operations.construct_board("00_00_00_00_00_00_00_00=00_00_00_00_00_00_00_00=00_00_00_00_00_00_00_00=bp_00_00_00_00_00_wr_00=wp_00_00_wr_00_00_00_00=00_00_00_00_00_00_00_bk=00_00_00_00_wk_00_00_00=00_00_00_00_00_00_00_00");
+        char[][][] board = operations.construct_board(
+            "00_br_00_00_bk_bb_00_00=wq_00_00_00_bp_00_00_bp=bn_00_bp_bp_00_bp_00_00=00_bb_00_00_00_00_00_wp=00_00_00_00_00_00_00_00=00_00_wp_00_wp_wp_bq_00=wp_wp_00_wp_00_00_wp_00=wr_00_wb_00_00_00_wk_wr"    
+        );
         operations.print_board(board);
         long t0 = System.currentTimeMillis();
         recursive_score_w_position(board, 'b', 5, 0, 'p');
@@ -282,13 +284,12 @@ public class ai_piece_val_pos
         char attacking_piece;
         char attacked_piece;
         int score;
-        int num_no_change = 0;
-        ArrayList<int[][]> neutral_moves = new ArrayList<int[][]>();
+        
         //write scores
         for (int i=0; i<mvs.size(); i++)
         {
             //get score
-            move = mvs.remove(i);
+            move = mvs.get(i);
             attacking_piece = board[move[0][0]][move[0][1]][1];
             attacked_piece = board[move[1][0]][move[1][1]][1];
             score = score0 + 
@@ -296,39 +297,13 @@ public class ai_piece_val_pos
                         position_value(attacked_piece, move[1][0], move[1][1]) +
                         ai_util.piece_value(attacked_piece) ;
             
-            if (score == score0)
-            {
-                num_no_change++;
-                neutral_moves.add(move);
-                i--;
-            }
-            else
-            {
-                scores.add(score);
-                mvs.add(i, move);
-            }
+            
+            scores.add(score);
+            
+            
         }
-        qsort(mvs, scores, 0, scores.size() - 1);
-        if (scores.size()>0) for (int i=scores.size() - 1; i>-1; i--)
-        {
-            if (scores.get(i)>score0)
-            {
-                for (int j = 0; j<num_no_change; j++)
-                {
-                    scores.add(i+1, score0);
-                    mvs.add(i+1, neutral_moves.remove(0));
-                }
-                break;
-            }
-        }
-        else 
-        {
-            for (int i=0; i<num_no_change; i++)
-            {
-                scores.add(score0);
-                mvs.add(neutral_moves.remove(0));
-            }
-        }
+        sort(mvs, scores);
+        
         //if (false == verify_sort(scores))
         //    System.out.println("Not sorted");
         return scores;
@@ -347,13 +322,20 @@ public class ai_piece_val_pos
         return out;
     }
     
-    private static void qsort(ArrayList<int[][]> mvs, ArrayList<Integer> scores, int start, int end)
+    private static void sort(ArrayList<int[][]> mvs, ArrayList<Integer> scores)
     {
-        if (start < end)
+        int score;
+        for (int i=1; i<scores.size(); i++)
         {
-            int p_index = partition(mvs, scores, start, end);
-            qsort(mvs, scores, start, p_index-1);
-            qsort(mvs, scores, p_index+1, end);
+            score = scores.get(i);
+            for (int j=0; j<i; j++)
+            {
+                if (score >= scores.get(j))
+                {
+                    move_to(mvs, scores, i, j);
+                    break;
+                }
+            }
         }
     }
     private static void move_to(ArrayList<int[][]> mvs, ArrayList<Integer> scores, int i0, int i_f)
@@ -361,29 +343,7 @@ public class ai_piece_val_pos
         mvs.add(i_f, mvs.remove(i0));
         scores.add(i_f, scores.remove(i0));
     }
-    private static int partition(ArrayList<int[][]> mvs, ArrayList<Integer> scores, int start, int end)
-    {
-        int pivot = scores.get(end);
-        int p_index = start;
-        //int duds = 0;
-        //int score;
-        for (int i=start; i < end; i++)
-        {
-            if (scores.get(i)> pivot)// most new scores are greater than the previous if not equal. 
-            {
-                //Collections.swap(scores, i, p_index);
-                //Collections.swap(mvs, i, p_index);
-                move_to(mvs,scores, i, start);//p_index);
-                p_index++;
-            }
-        }
-        move_to(mvs, scores, end, p_index);
-        //Collections.swap(scores, p_index, end);
-        //Collections.swap(mvs, p_index, end);
-        
-        return  p_index;
-    }
-
+    
 }
 /** 
 
