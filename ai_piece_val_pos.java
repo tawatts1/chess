@@ -182,15 +182,15 @@ public class ai_piece_val_pos
             for (int i=0; i<mvs.size(); i++)
             {
                 int[][] move = mvs.get(i);
-                char attacking_piece = board1[move[0][0]][move[0][1]][1];
-                char attacked_piece = board1[move[1][0]][move[1][1]][1];
+                char[] attacking_piece = board1[move[0][0]][move[0][1]];
+                char[] attacked_piece = board1[move[1][0]][move[1][1]];
                 if (board1[move[1][0]][move[1][1]][1] == 'k')
                     scores[i] = 9000 + n_left; // and don't go deeper
                 else 
                     scores[i] = current_board_score + 
-                    position_difference(attacking_piece, move) +
-                    position_value(attacked_piece, move[1][0], move[1][1]) +
-                    ai_util.piece_value(attacked_piece) ;
+                    position_difference(attacking_piece[0], attacking_piece[1], move) +
+                    position_value(attacked_piece[0], attacked_piece[1], move[1][0], move[1][1]) +
+                    ai_util.piece_value(attacked_piece[1]) ;
                     //board_score_position(operations.execute_move(board1, move[0], move[1]),move_color);
                 if (scores[i] > -wcs)
                 {
@@ -208,15 +208,17 @@ public class ai_piece_val_pos
     {
         int out = 0;
         int val = 0;
-        char pp;
+        char piece_color;
+        char piece;
         for (int i=0; i<8; i++)
         {
             for (int j=0; j<8; j++)
             {
-                pp = board[i][j][1];
-                if (pp!='0')
+                piece = board[i][j][1];
+                if (piece!='0')
                 {
-                    val = ai_util.piece_value(pp)+position_value(pp,i,j);
+                    piece_color = board[i][j][0];
+                    val = ai_util.piece_value(piece)+position_value(piece_color, piece,i,j);
                     if (color==board[i][j][0]){out+=val;}
                     else {out-=val;}
                 }
@@ -225,17 +227,22 @@ public class ai_piece_val_pos
         return out;
     }
 
-    private static int position_difference(char piece, int[][] move)
+    private static int position_difference(char color, char piece, int[][] move)
     {
-        return position_value(piece, move[1][0], move[1][1]) - position_value(piece, move[0][0], move[0][1]);
+        return position_value(color, piece, move[1][0], move[1][1]) - position_value(color, piece, move[0][0], move[0][1]);
     }
 
-    private static int position_value(char piece, int i, int j)
+    private static int position_value(char color, char piece, int i, int j)
     {
         int out = 0;
         switch (piece)
         {
-            //case 'p' : out=100; break; no pawn handling
+            case 'p' : 
+                if (color == 'b')
+                    out = i;
+                else
+                    out = 7 - i; 
+                break; 
             case 'r' : 
             case 'q' : out = 14;
                 if (piece == 'r') break;
@@ -281,8 +288,8 @@ public class ai_piece_val_pos
     {
         ArrayList<Integer> scores = new ArrayList<>();
         int[][] move = new int[2][2];
-        char attacking_piece;
-        char attacked_piece;
+        char[] attacking_piece;
+        char[] attacked_piece;
         int score;
         
         //write scores
@@ -290,12 +297,12 @@ public class ai_piece_val_pos
         {
             //get score
             move = mvs.get(i);
-            attacking_piece = board[move[0][0]][move[0][1]][1];
-            attacked_piece = board[move[1][0]][move[1][1]][1];
+            attacking_piece = board[move[0][0]][move[0][1]];
+            attacked_piece = board[move[1][0]][move[1][1]];
             score = score0 + 
-                        position_difference(attacking_piece, move) +
-                        position_value(attacked_piece, move[1][0], move[1][1]) +
-                        ai_util.piece_value(attacked_piece) ;
+                        position_difference(attacking_piece[0],attacking_piece[1], move) +
+                        position_value(attacked_piece[0], attacked_piece[1], move[1][0], move[1][1]) +
+                        ai_util.piece_value(attacked_piece[1]) ;
             
             
             scores.add(score);
