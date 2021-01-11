@@ -52,7 +52,7 @@ public static void main(String[] args) throws Exception {
     if (mvs.size()==0) // if none of those moves were legal, find a group that are
     {
       mvs = moves_methods.get_moves(board, clr);
-      mvs = moves_methods.filter_illegal_moves(board, moves_methods.get_moves(board, clr));
+      mvs = moves_methods.filter_illegal_moves(board, mvs);
     }
     
     if (check)

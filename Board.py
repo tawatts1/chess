@@ -26,7 +26,8 @@ class Board(ttk.Frame):
                  highlight_color = "yellow",
                  ai = random_move, ai2 = None):
         super().__init__(parent)
-
+        icon = tk.PhotoImage(file = "images/bongcloud.png")
+        parent.iconphoto(False, icon)
         self.parent = parent
         self.board_color = board_color
         self.indication_color = indication_color
@@ -186,7 +187,7 @@ class Board(ttk.Frame):
 if __name__ == '__main__':
     from pyjava_ai import java_ai
     #partial(java_ai, **{'N':N, 'post_strategy': white})
-    ai1 = partial(java_ai, **{'N':5, 'scoring': 'val'})
+    ai1 = partial(java_ai, **{'N':5, 'scoring': 'pos'})
     ai2 = partial(java_ai, **{'N':5, 'scoring': 'pos'})
     root = tk.Tk()
     #root.protocol("WM_DELETE_WINDOW", quit_window())

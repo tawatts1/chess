@@ -48,7 +48,7 @@ public class ai_piece_val_pos
 
         int negative_next_board_score;
         
-        int wcs = -10000; // start as the worst possible
+        int wcs = -100000; // start as the worst possible
         int updated_extra_moves;
         int updated_N;
         for (int i=0; i<mvs.size(); i++)
@@ -125,7 +125,7 @@ public class ai_piece_val_pos
         ArrayList<int[][]> mvs = moves_methods.get_moves(board1, my_coords);
         
         int[] scores = new int[mvs.size()];
-        int new_wcs = -10000; // start as the worst possible
+        int new_wcs = -100000; // start as the worst possible
 
 
         if (n_left > 1)
@@ -155,7 +155,7 @@ public class ai_piece_val_pos
                 }
                 negative_next_board_score = - next_board_scores.get(i);
                 if (attacked_piece == 'k')
-                    scores[i] = 9000 + n_left; // and don't go deeper
+                    scores[i] = 90000 + n_left; // and don't go deeper
                 else 
                     scores[i] = minmax_position(
                         operations.execute_move(board1, move[0], move[1]), 
@@ -185,7 +185,7 @@ public class ai_piece_val_pos
                 char[] attacking_piece = board1[move[0][0]][move[0][1]];
                 char[] attacked_piece = board1[move[1][0]][move[1][1]];
                 if (board1[move[1][0]][move[1][1]][1] == 'k')
-                    scores[i] = 9000 + n_left; // and don't go deeper
+                    scores[i] = 90000 + n_left; // and don't go deeper
                 else 
                     scores[i] = current_board_score + 
                     position_difference(attacking_piece[0], attacking_piece[1], move) +
@@ -238,33 +238,39 @@ public class ai_piece_val_pos
         switch (piece)
         {
             case 'p' : 
+                int k;
                 if (color == 'b')
-                    out = i;
+                    k = i;
                 else
-                    out = 7 - i; 
+                    k = 7 - i; 
+                
+                if (k==7)
+                    out = ai_util.piece_value('q');//k;
+                else if (k>2)
+                    out = k;
                 break; 
             case 'r' : 
-            case 'q' : out = 14;
+            case 'q' : out = 140;
                 if (piece == 'r') break;
             case 'b' : 
-                if      (any_equal(0,7,i,j)) out = 7;
-                else if (any_equal(1,6,i,j)) out = 9;
-                else if (any_equal(2,5,i,j)) out = 11;
-                else out = 13;
+                if      (any_equal(0,7,i,j)) out = 70;
+                else if (any_equal(1,6,i,j)) out = 90;
+                else if (any_equal(2,5,i,j)) out = 110;
+                else out = 130;
                 break;
             case 'n' : 
                 if (any_equal(0,7,i,j)) 
                     if (all_equal_to_something(0, 7, i, j)) 
-                        out = 2;
+                        out = 20;
                     else if (any_equal(1, 6, i, j))
-                        out = 3;
+                        out = 30;
                     else
-                        out = 4;
+                        out = 40;
                 else if (any_equal(1, 6, i, j))
                     if (all_equal_to_something(1, 6, i, j))
-                    out = 4;
-                    else out = 6;
-                else out = 8;
+                    out = 40;
+                    else out = 60;
+                else out = 80;
                 break;
             default  : break;
         }

@@ -23,11 +23,11 @@ public class ai_util
         int out=0;
         switch (piece)
         {
-            case 'p' : out=100; break;
+            case 'p' : out=1000; break;
             case 'b' : 
-            case 'n' : out = 300; break;
-            case 'r' : out = 500; break;
-            case 'q' : out = 900; break;
+            case 'n' : out = 3000; break;
+            case 'r' : out = 5000; break;
+            case 'q' : out = 9000; break;
             default  : break;
         }
         return out;
