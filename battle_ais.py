@@ -48,13 +48,13 @@ def board_score(board):
     return score
 
 
-def run_battle(N1=2,N2=2, white = 'pawns', black='kill', T = 60):
+def run_battle(N1=2,N2=2, white = 'val', black='val', T = 1):
     fname = f'game_results/{N1}{white}_V_{N2}{black}'
     #white ai:
-    ai1 = partial(java_ai, **{'N':N1, 'scoring': white})
+    ai1 = partial(java_ai, **{'N':N1, 'scoring': white, 'verbose':False})
 
     # black ai:
-    ai2 = partial(java_ai, **{'N':N2, 'scoring': black})
+    ai2 = partial(java_ai, **{'N':N2, 'scoring': black, 'verbose':False})
     ais = {'w':ai1, 'b':ai2}
     
     turn = 'w'

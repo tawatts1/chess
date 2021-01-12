@@ -23,12 +23,14 @@ def java_ai(board, color, N=4,
             specialty = 'knight', 
             extra_moves = 0,
             scoring = 'val',
-            file = 'next_move'):
+            file = 'next_move',
+            verbose=True):
     #t0 = time.time()
     string = java_board_string(board)
     #print(string)
     cmd0 = f"java {file} {string} {color} {N} {special_option} {specialty} {extra_moves} {scoring}"
-    #print(cmd0)
+    if verbose:
+        print(cmd0)
     cmd = cmd0.split()
     #if special_option:
     #    cmd.append(special_option)
