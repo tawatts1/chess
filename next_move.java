@@ -39,7 +39,13 @@ public static void main(String[] args) throws Exception {
     case "pos2" : 
       mvs = 
           ai_piece_val_pos2.recursive_score_w_position(board, clr, N, extra_moves_, specialty_piece);
-      break;
+    case "pos3" : 
+      mvs = 
+          ai_piece_val_pos3.recursive_score_w_position(board, clr, N, extra_moves_, specialty_piece);break;
+    case "pos4" : 
+      mvs = 
+          ai_piece_val_pos4.recursive_score_w_position(board, clr, N, extra_moves_, specialty_piece);break;
+
     default : throw new Exception("Not implemented");
     }
     
