@@ -24,11 +24,25 @@ from move_calc import moves
 
 
 class VBoard(list):
-    def __init__(self, empty = False):
-        if not empty:
-            self = super(VBoard, self).__init__(gen_standard_board_array())
-        else:
+    def __init__(self, empty = False, board_str = None):
+        if empty: # board of all empty squares. I may take this out later. 
             self = super(VBoard, self).__init__([[EMPTY for j in range(8)] for i in range(8)])
+        
+        elif board_str: # generate virtual board from a string
+            self = super(VBoard, self).__init__(
+                [
+                    [
+                        [
+                            char for char in piece
+                        ] 
+                        for piece in row.split('_')
+                    ] 
+                    for row in board_str.split('=')
+                ] 
+            )
+        
+        else: # standard starting board
+            self = super(VBoard, self).__init__(gen_standard_board_array())
     def moves(self, coord, color):
         return moves(self, coord, color)
     def get_next_boards(self, color):

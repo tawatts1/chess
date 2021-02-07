@@ -18,13 +18,13 @@ from game_setup import piece_to_fname
 from game_ai import random_move
 
 
-
 class Board(ttk.Frame):
     def __init__(self, parent, piece_func = piece_to_fname,
                  board_color = {0:'#FFB310',1:'#990033'},
                  indication_color =  {0:'#CAA453',1:'#974B64'}, 
                  highlight_color = "yellow",
-                 ai = random_move, ai2 = None):
+                 ai = random_move, ai2 = None, 
+                 debug_str = None):
         super().__init__(parent)
         icon = tk.PhotoImage(file = "images/bongcloud.png")
         parent.iconphoto(False, icon)
@@ -35,13 +35,16 @@ class Board(ttk.Frame):
         self.ai = ai
         self.ai2 = ai2
         self.turn = 'w'
-        self.setup_new_game()
+        self.setup_new_game(debug_str = debug_str)
         self.grid(row=0, column=0)
         
 
-    def setup_new_game(self):
+    def setup_new_game(self, debug_str):
         #each board object will contain a list of lists of piece lists:
-        self.vb = VBoard() # defualt is starting board positions
+        if debug_str:
+            self.vb = VBoard(board_str = debug_str)
+        else:
+            self.vb = VBoard() # defualt is starting board positions
         
         #the 8x8 array of squares, each containing a button:
         self.sq_arr = []
@@ -92,25 +95,28 @@ class Board(ttk.Frame):
          '''
         
         if not self.ai2: # only one ai
+            self.paint_checkerboard()
+            self.execute_move(c1,c2)
+            print(self.vb)
+            self.change_turn()
+
             if not in_checkmate(self.vb, self.turn):
-                self.paint_checkerboard()
-                self.execute_move(c1,c2)
-                print(self.vb)
-                self.change_turn()
-                if not in_checkmate(self.vb, self.turn):
-                    self.parent.update()
-                    
-                    # have ai do its thing
-                    if self.ai:
-                        c3, c4 = self.ai(self.vb, color = 'b')
-                        self.execute_move(c3,c4)
-                        #vb = VBoard(self.sq_dict)
-                        self.change_turn()
-                else:
-                    print('checkmate')
-                self.reset_move_commands(color = self.turn)
+                self.parent.update()
+                
+                # have ai do its thing
+                if self.ai:
+                    c3, c4 = self.ai(self.vb, color = 'b')
+                    self.execute_move(c3,c4)
+                    #vb = VBoard(self.sq_dict)
+                    self.change_turn()
             else:
                 print('checkmate')
+            
+            self.reset_move_commands(color = self.turn)
+            
+            if in_checkmate(self.vb, self.turn):
+                print('checkmate, bruh. \nyou stink!')
+            
         else: # if there are two ais:
             max_moves = 150
             for i in range(150): 
@@ -187,9 +193,10 @@ class Board(ttk.Frame):
 if __name__ == '__main__':
     from pyjava_ai import java_ai
     #partial(java_ai, **{'N':N, 'post_strategy': white})
+    #debug_str0 = "br_00_bb_00_bk_bb_00_br=bp_bp_bp_bp_00_bp_bp_bp=00_00_00_00_bp_bq_00_00=00_00_00_00_00_00_00_00=00_bn_00_wp_wk_00_00_00=00_00_00_00_wp_wn_00_00=wp_wp_wp_00_00_00_wp_wp=wr_wn_wb_00_00_wr_00_00"
     ai1 = partial(java_ai, **{'N':5, 'scoring': 'pos'})
     ai2 = partial(java_ai, **{'N':5, 'scoring': 'pos'})
     root = tk.Tk()
     #root.protocol("WM_DELETE_WINDOW", quit_window())
-    b1 = Board(root, ai = ai1, ai2 = ai2)
+    b1 = Board(root, ai = ai1)#, ai2 = ai2)
     root.mainloop()
