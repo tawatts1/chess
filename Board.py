@@ -189,13 +189,21 @@ class Board(ttk.Frame):
                     self.sq_arr[i][j].config(bg = bg_color)
     def change_turn(self):
         self.turn = {'b':'w','w':'b'}[self.turn]
-   
+
+def compile_java():
+    import subprocess
+    subprocess.run(
+        ['javac', 'next_move.java'],
+        check=True, 
+        stdout=subprocess.PIPE).stdout.decode('ascii')
+
 if __name__ == '__main__':
     from pyjava_ai import java_ai
+    compile_java()
     #partial(java_ai, **{'N':N, 'post_strategy': white})
     #debug_str0 = "br_00_bb_00_bk_bb_00_br=bp_bp_bp_bp_00_bp_bp_bp=00_00_00_00_bp_bq_00_00=00_00_00_00_00_00_00_00=00_bn_00_wp_wk_00_00_00=00_00_00_00_wp_wn_00_00=wp_wp_wp_00_00_00_wp_wp=wr_wn_wb_00_00_wr_00_00"
-    ai1 = partial(java_ai, **{'N':5, 'scoring': 'pos'})
-    ai2 = partial(java_ai, **{'N':5, 'scoring': 'pos'})
+    ai1 = partial(java_ai, **{'N':6, 'scoring': 'build_up'})
+    #ai2 = partial(java_ai, **{'N':6, 'scoring': 'pos'})
     root = tk.Tk()
     #root.protocol("WM_DELETE_WINDOW", quit_window())
     b1 = Board(root, ai = ai1)#, ai2 = ai2)
