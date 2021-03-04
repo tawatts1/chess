@@ -36,16 +36,24 @@ public static void main(String[] args) throws Exception {
       mvs = 
           ai_piece_val_pos.recursive_score_w_position(board, clr, N, extra_moves_ ,specialty_piece);
       break;
+    /*
     case "pos2" : 
       mvs = 
           ai_piece_val_pos2.recursive_score_w_position(board, clr, N, extra_moves_, specialty_piece);
+      break;
     case "pos3" : 
       mvs = 
-          ai_piece_val_pos3.recursive_score_w_position(board, clr, N, extra_moves_, specialty_piece);break;
+          ai_piece_val_pos3.recursive_score_w_position(board, clr, N, extra_moves_, specialty_piece);
+      break;
     case "pos4" : 
       mvs = 
-          ai_piece_val_pos4.recursive_score_w_position(board, clr, N, extra_moves_, specialty_piece);break;
-
+          ai_piece_val_pos4.recursive_score_w_position(board, clr, N, extra_moves_, specialty_piece);
+      break;
+    */
+    case "build_up" : 
+      mvs = 
+          ai_build_up.recursive_score_w_position(board, clr, N, extra_moves_ ,specialty_piece);
+      break;
     default : throw new Exception("Not implemented");
     }
     
@@ -70,6 +78,7 @@ public static void main(String[] args) throws Exception {
     }
     else
     {
+      
       if (mvs.size()>0)
       {
         //System.out.println(args[6]);

@@ -184,14 +184,19 @@ public class operations {
   }
   public static void print_board(char[][][] board)
   {
+    System.out.println("+----+----+----+----+----+----+----+----+");
     for (char[][] row : board)
     {
-      String row_str = "";
+      String row_str = "| ";
       for (char[] piece : row)
       {
-        row_str += "" + piece[0] + piece[1] + "  ";
+        if (piece[0] == '0')
+          row_str += "   | ";
+        else
+          row_str += "" + piece[0] + piece[1] + " | ";
       }
       System.out.println(row_str);
+      System.out.println("+----+----+----+----+----+----+----+----+");
     }
   }
 
