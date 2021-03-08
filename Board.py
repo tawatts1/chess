@@ -22,6 +22,7 @@ class Board(ttk.Frame):
     def __init__(self, parent, piece_func = piece_to_fname,
                  board_color = {0:'#FFB310',1:'#990033'},
                  indication_color =  {0:'#CAA453',1:'#974B64'}, 
+                 losing_color = {0:'#AB0520', 1:'#0C234B'},
                  highlight_color = "yellow",
                  ai = random_move, ai2 = None, 
                  debug_str = None):
@@ -31,6 +32,7 @@ class Board(ttk.Frame):
         self.parent = parent
         self.board_color = board_color
         self.indication_color = indication_color
+        self.losing_color = losing_color
         self.highlight_color = highlight_color
         self.ai = ai
         self.ai2 = ai2
@@ -116,6 +118,7 @@ class Board(ttk.Frame):
             
             if in_checkmate(self.vb, self.turn):
                 print('checkmate, bruh. \nyou stink!')
+                self.loser_colors()
             
         else: # if there are two ais:
             max_moves = 150
@@ -187,8 +190,14 @@ class Board(ttk.Frame):
                 else:
                     bg_color = self.board_color[shade_num]
                     self.sq_arr[i][j].config(bg = bg_color)
+    def loser_colors(self):
+        for i in range(8):
+            for j in range(8):
+                self.sq_arr[i][j].config(bg=self.losing_color[(i%2+j%2)%2])
+
     def change_turn(self):
         self.turn = {'b':'w','w':'b'}[self.turn]
+    
 
 def compile_java():
     import subprocess
